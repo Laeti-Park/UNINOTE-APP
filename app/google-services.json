@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "959539090579",
+    "firebase_url": "https://myretrofittest-1cadd-default-rtdb.firebaseio.com",
+    "project_id": "myretrofittest-1cadd",
+    "storage_bucket": "myretrofittest-1cadd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:959539090579:android:3146f3c28fcdc0aa86e966",
+        "android_client_info": {
+          "package_name": "com.example.schoollifeproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "959539090579-7kt6p5ng32di0nsirm9vuonhmjcg9dru.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDj-xjLPOqu2FjIhZ_oAsXyQnBnhYH4Ubk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "959539090579-7kt6p5ng32di0nsirm9vuonhmjcg9dru.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
