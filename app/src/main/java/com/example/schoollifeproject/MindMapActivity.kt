@@ -1,6 +1,5 @@
 package com.example.schoollifeproject
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
@@ -8,8 +7,10 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.example.schoollifeproject.databinding.ActivityMindMapBinding
 import me.jagar.mindmappingandroidlibrary.Views.Item
+import me.jagar.mindmappingandroidlibrary.Views.ItemLocation
 import me.jagar.mindmappingandroidlibrary.Views.MindMappingView
 
 class MindMapActivity : AppCompatActivity() {
@@ -28,24 +29,39 @@ class MindMapActivity : AppCompatActivity() {
         addRoot()
         nodeEvent()
     }
-    private fun addRoot(){
+
+    private fun addRoot() {
         rootNode = Item(this, "Root", "Hello", true)
         mindMappingView.addCentralItem(rootNode, false)
+
+        val freshman = Item(this, "1st", "Hello", true)
+        val sophomore = Item(this, "2nd", "Hello", true)
+        val junior = Item(this, "3rd", "Hello", true)
+        val senior = Item(this, "4st", "Hello", true)
+
+        mindMappingView.addItem(
+            freshman, rootNode, 200, 15, ItemLocation.TOP, true, null)
+        mindMappingView.addItem(
+            sophomore, rootNode, 200, 15, ItemLocation.LEFT, true, null)
+        mindMappingView.addItem(
+            junior, rootNode, 200, 15, ItemLocation.RIGHT, true, null)
+        mindMappingView.addItem(
+            senior, rootNode, 200, 15, ItemLocation.BOTTOM, true, null)
     }
 
-    private fun nodeEvent(){
+    private fun nodeEvent() {
         rootNode.setOnClickListener {
             bottomEvent(rootNode, true)
             popupEventR(rootNode)
         }
-        mindMappingView.setOnItemClicked{ item ->
+        mindMappingView.setOnItemClicked { item ->
             bottomEvent(item, false)
             popupEventR(item)
         }
 
     }
 
-    private fun bottomEvent(node:Item, root: Boolean){
+    private fun bottomEvent(node: Item, root: Boolean) {
         binding.bottomNavigationView.visibility = View.VISIBLE
         binding.bottomNavigationView.setOnNavigationItemSelectedListener {
             if (root) {
@@ -69,7 +85,10 @@ class MindMapActivity : AppCompatActivity() {
                         }
                         childNodeNum++
                         nodeLocation++
-                        Log.d("XYZ", "Child${childNode!![childNodeNum-1].x} ${childNode!![childNodeNum-1].y}")
+                        Log.d(
+                            "XYZ",
+                            "Child${childNode!![childNodeNum - 1].x} ${childNode!![childNodeNum - 1].y}"
+                        )
                         binding.bottomNavigationView.visibility = View.INVISIBLE
                     }
                 }

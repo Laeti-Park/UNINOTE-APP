@@ -22,5 +22,10 @@ class MenuActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+        btnMap.setOnClickListener {
+            val intent = Intent(this, MindMapActivity::class.java)
+            startActivity(intent)
+        }
+
     }
 }
