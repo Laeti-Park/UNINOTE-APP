@@ -6,11 +6,40 @@
     android:layout_height="match_parent"
     tools:context=".MindMapActivity">
 
-    <me.jagar.mindmappingandroidlibrary.Views.MindMappingView
-        android:id="@+id/mindMappingView"
+    <me.jagar.mindmappingandroidlibrary.Zoom.ZoomLayout
+        android:id="@+id/zoomLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#fff"/>
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:scrollbars="vertical|horizontal"
+        app:alignment="center"
+        app:animationDuration="280"
+        app:flingEnabled="false"
+        app:hasClickableChildren="true"
+        app:horizontalPanEnabled="true"
+        app:maxZoom="2.5"
+        app:maxZoomType="zoom"
+        app:minZoom="0.7"
+        app:minZoomType="zoom"
+        app:oneFingerScrollEnabled="false"
+        app:overPinchable="true"
+        app:overScrollHorizontal="true"
+        app:overScrollVertical="true"
+        app:scrollEnabled="true"
+        app:threeFingersScrollEnabled="true"
+        app:transformation="centerInside"
+        app:transformationGravity="auto"
+        app:twoFingersScrollEnabled="true"
+        app:verticalPanEnabled="true"
+        app:zoomEnabled="true">
+
+        <me.jagar.mindmappingandroidlibrary.Views.MindMappingView
+            android:id="@+id/mindMappingView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="#fff" />
+    </me.jagar.mindmappingandroidlibrary.Zoom.ZoomLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
@@ -21,6 +50,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:menu="@menu/bottom_menu" />
+
     <EditText
         android:id="@+id/editNode"
         android:layout_width="match_parent"
@@ -32,4 +62,3 @@
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@id/bottomNavigationView" />
 </androidx.constraintlayout.widget.ConstraintLayout>
-
