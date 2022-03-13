@@ -3,7 +3,13 @@ package com.example.schoollifeproject
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import com.example.schoollifeproject.databinding.ActivityMenuBinding
+import androidx.annotation.NonNull
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
 
 class MenuActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -15,7 +21,7 @@ class MenuActivity : AppCompatActivity() {
         val btnNotice = binding.btnNotice
         val tvNick = binding.tvNick
 
-        tvNick.setText(intent.getStringExtra("id")+"님 환영합니다")
+        tvNick.setText(intent.getStringExtra("name")+"님 환영합니다")
 
         btnNotice.setOnClickListener {
             val intent = Intent(this, ListActivity::class.java)
@@ -28,4 +34,5 @@ class MenuActivity : AppCompatActivity() {
         }
 
     }
+
 }
