@@ -15,7 +15,17 @@ data class PostModel(
     var userName: String? = null,
     @Expose
     @SerializedName("error")
-    var error: String? = null
-
-
+    var error: String? = null,
+    @Expose
+    @SerializedName("countKey")
+    var countKey: Int? = null,
+    @Expose
+    @SerializedName("noticeTitle")
+    var noticeTitle: String? = null,
+    @Expose
+    @SerializedName("noticeName")
+    var noticeName: String? =null,
+    @Expose
+    @SerializedName("noticeDate")
+    var noticeDate: String? = null,
 )
