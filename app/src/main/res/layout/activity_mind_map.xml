@@ -10,8 +10,6 @@
         android:id="@+id/zoomLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:gravity="center"
         android:scrollbars="vertical|horizontal"
         app:alignment="center"
         app:animationDuration="280"
