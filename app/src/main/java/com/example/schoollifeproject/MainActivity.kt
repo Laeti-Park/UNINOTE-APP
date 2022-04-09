@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity() {
                     Log.d("dbTestBody",response.body().toString())
                     if(!response.body().toString().isEmpty()) {
                         if(pw.equals( response.body()?.userPassword.toString())) {
+                            intent.putExtra("ID", response.body()?.userID.toString())
                             intent.putExtra("name", response.body()?.userName.toString())
                             startActivity(intent)
                         }

@@ -1,8 +1,14 @@
 package com.example.schoollifeproject
 
+import android.content.DialogInterface
+import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.schoollifeproject.databinding.ItemContactsBinding
 
@@ -29,11 +35,18 @@ class ContactsListAdapter(val itemList: List<Contacts>) :
     class ContactsViewHolder(private val binding: ItemContactsBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        //item_contacts.xml의 id를 가져온건데 안됨
         fun bind(item: Contacts) {
             binding.title.text = item.Title
             binding.writer.text = item.Writer
             binding.date.text = item.date
+            binding.rootView.setOnClickListener {
+                Toast.makeText(itemView.context, "ss", Toast.LENGTH_SHORT).show()
+                val intent = Intent(itemView.context, noticeActivity::class.java)
+                intent.putExtra("key", item.num)
+                intent.putExtra("title", item.Title)
+                startActivity(itemView.context, intent, null)
+
+            }
         }
     }
 }

@@ -28,4 +28,10 @@ data class PostModel(
     @Expose
     @SerializedName("noticeDate")
     var noticeDate: String? = null,
+    @Expose
+    @SerializedName("noticeKey")
+    var noticeKey: Int? = null,
+    @Expose
+    @SerializedName("noticeContent")
+    var noticeContents: String? = null
 )

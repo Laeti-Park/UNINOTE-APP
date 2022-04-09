@@ -9,5 +9,8 @@ object MyApp {
     const val Select_url: String = "/login_select.php"
     const val Register_url: String = "/register_insert.php"
     const val notice_key_search_url: String = "/notice_key_search.php"
-    const val notice_load_url: String = "/register_load.php"
+    const val notice_load_url: String = "/notice_load.php"
+    const val notice_save_url: String = "/notice_insert.php"
+    const val node_save_url: String = "/node_save.php"
+    const val notice_open_url: String = "/notice_open.php"
 }

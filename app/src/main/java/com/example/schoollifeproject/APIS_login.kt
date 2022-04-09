@@ -42,6 +42,33 @@ interface APIS_login {
         @Field("countKey") countKey: Int
     ): Call<PostModel>
 
+    @FormUrlEncoded
+    @POST(MyApp.notice_save_url)
+    fun notice_save(
+        @Field("noticeTitle") noticeTitle: String,
+        @Field("userID") userID: String,
+        @Field("date") date: String,
+        @Field("noticeContents") noticeContents: String
+        ): Call<PostModel>
+
+    @FormUrlEncoded
+    @POST(MyApp.notice_open_url)
+    fun notice_open(
+        @Field("key") key: Int
+    ):Call<PostModel>
+
+    @FormUrlEncoded
+    @POST(MyApp.node_save_url)
+    fun node_save(
+        @Field("nodeID") nodeID: String,
+        @Field("nodeY") nodeY: Int,
+        @Field("nodeX") nodeX: Int,
+        @Field("userID") userID: String,
+        @Field("nodeContect") nodeContect: String,
+        @Field("nodeCount") nodeCount: Int
+    ): Call<PostModel>
+
+
     companion object { // static 처럼 공유객체로 사용가능함. 모든 인스턴스가 공유하는 객체로서 동작함.
         //서버 IP만 입력해주세요~
         private const val BASE_URL = "http://220.118.54.17"
