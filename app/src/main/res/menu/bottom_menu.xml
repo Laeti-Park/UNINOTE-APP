@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/childNodeAdd"
+        android:id="@+id/bottomMenu1"
         android:icon="@android:drawable/ic_menu_search"
-        android:title="하위 노드" />
+        android:title="Child" />
     <item
-        android:id="@+id/cameraItem"
-        android:icon="@android:drawable/ic_menu_camera"
-        android:title="생각 중" />
+        android:id="@+id/bottomMenu2"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:title="Edit" />
     <item
-        android:id="@+id/callItem"
-        android:icon="@android:drawable/ic_menu_call"
-        android:title="생각 중" />
+        android:id="@+id/bottomMenu3"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:title="Delete" />
 </menu>

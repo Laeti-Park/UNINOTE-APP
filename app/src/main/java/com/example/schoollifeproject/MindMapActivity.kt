@@ -1,417 +1,402 @@
 package com.example.schoollifeproject
 
-import android.content.ClipData
-import android.content.ClipDescription
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Point
-import android.graphics.drawable.ColorDrawable
-import android.os.Build
+import android.graphics.*
 import android.os.Bundle
-import android.util.DisplayMetrics
-import android.util.Log
-import android.view.*
-import android.view.inputmethod.InputMethodManager
-import android.widget.PopupMenu
+import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import com.example.schoollifeproject.databinding.ActivityMindMapBinding
-import me.jagar.mindmappingandroidlibrary.Views.Item
-import me.jagar.mindmappingandroidlibrary.Views.ItemLocation
-import me.jagar.mindmappingandroidlibrary.Views.MindMappingView
-import me.jagar.mindmappingandroidlibrary.Zoom.ZoomLayout
+import com.gyso.treeview.TreeViewEditor
+import com.gyso.treeview.line.BaseLine
+import com.gyso.treeview.line.StraightLine
+import com.gyso.treeview.model.NodeModel
+import com.gyso.treeview.model.TreeModel
 import java.util.*
-import kotlin.collections.ArrayList
+import java.util.concurrent.atomic.AtomicInteger
+import android.os.SystemClock
+import android.util.Log
+import android.view.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.PopupWindow
+import android.widget.Toast
+import com.gyso.treeview.layout.*
 
+import com.gyso.treeview.listener.TreeViewControlListener
 
-// 뷰 충돌 이벤트? + 삭제 기능 구현 + onefingerscroll
 
 class MindMapActivity : AppCompatActivity() {
+    val api = APIS_login.create()
+
+    val TAG = MainActivity::class.java.simpleName
     private lateinit var binding: ActivityMindMapBinding
-    private lateinit var mindMappingView: MindMappingView
-    private lateinit var rootNode: Item
-    private lateinit var grade1: Item
-    private lateinit var grade2: Item
-    private lateinit var grade3: Item
-    private lateinit var grade4: Item
-    private lateinit var mItem : Item
-
-    private lateinit var zoomLayout: ZoomLayout
-
-    private var childNodeTop = ArrayList<Item>()
-    private var childNodeLeft = ArrayList<Item>()
-    private var childNodeRight = ArrayList<Item>()
-    private var childNodeBottom = ArrayList<Item>()
-
-    private var childNodeNum = Array<Int>(4, { 0 })
-    private val MAX_DURATION = 500
-
-    private lateinit var detector : GestureDetector
-
+    private lateinit var removeCache: Stack<NodeModel<ItemInfo>>
+    private var targetNode: NodeModel<ItemInfo>? = null
+    private val atomicInteger = AtomicInteger()
+    private val handler = Handler()
+    private var parentToRemoveChildren: NodeModel<ItemInfo>? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMindMapBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        mindMappingView = binding.mindMappingView
-        zoomLayout = binding.zoomLayout
 
-        val displaymetrics = DisplayMetrics()
-        windowManager.defaultDisplay.getMetrics(displaymetrics)
-        val screenWidth = displaymetrics.widthPixels
-        val screenHeight = displaymetrics.heightPixels
-
-        mindMappingView.layoutParams.width = (screenWidth * 2.5).toInt()
-        mindMappingView.layoutParams.height = (screenHeight * 2.5).toInt()
-
-        addRoot()
-
-        detector = GestureDetector(this,
-            object : GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
-
-                override fun onDown(event: MotionEvent): Boolean {
-                    Log.d("DEBUG_TAG", "onDown: $event")
-                    return true
-                }
-
-                override fun onFling(
-                    event1: MotionEvent,
-                    event2: MotionEvent,
-                    velocityX: Float,
-                    velocityY: Float
-                ): Boolean {
-                    Log.d("DEBUG_TAG", "onFling: $event1 $event2")
-                    return true
-                }
-
-                override fun onLongPress(event: MotionEvent) {
-                    Log.d("DEBUG_TAG", "onLongPress: $event")
-                }
-
-                override fun onScroll(
-                    event1: MotionEvent,
-                    event2: MotionEvent,
-                    distanceX: Float,
-                    distanceY: Float
-                ): Boolean {
-                    Log.d("DEBUG_TAG", "onScroll: $event1 $event2")
-                    return true
-                }
-
-                override fun onShowPress(event: MotionEvent) {
-                    Log.d("DEBUG_TAG", "onShowPress: $event")
-                }
-
-                override fun onSingleTapUp(event: MotionEvent): Boolean {
-                    Log.d("DEBUG_TAG", "onSingleTapUp: $event")
-                    return true
-                }
-
-                override fun onDoubleTap(event: MotionEvent): Boolean {
-                    Log.d("DEBUG_TAG", "onDoubleTap: $event")
-                    if(mItem == rootNode || mItem == grade1 || mItem == grade2 || mItem == grade3 || mItem == grade4){
-                        popupEventR(mItem)
-                    } else {
-                        popupEvent(mItem)
-                    }
-                    return true
-                }
-
-                override fun onDoubleTapEvent(event: MotionEvent): Boolean {
-                    Log.d("DEBUG_TAG", "onDoubleTapEvent: $event")
-                    return true
-                }
-
-                override fun onSingleTapConfirmed(event: MotionEvent): Boolean {
-                    Log.d("DEBUG_TAG", "onSingleTapConfirmed: $event")
-                    if(mItem == grade1 || mItem == grade2 || mItem == grade3 || mItem == grade4){
-                        bottomEvent(mItem, 0)
-                    } else {
-                        bottomEvent(mItem, 0)
-                    }
-                    return true
-                }
-            })
+        //demo init
+        initWidgets()
     }
 
-    private fun addRoot() {
-        rootNode = Item(this, "Root", "Hello", true)
-        mindMappingView.addCentralItem(rootNode, false)
-        rootNode.setOnTouchListener{ _, motionEvent ->
-            mItem = rootNode
-            detector.onTouchEvent(motionEvent)
-            true
-        }
+    /**
+     * To use a tree view, you should do 6 steps as follows:
+     * 1 customs adapter
+     *
+     * 2 configure layout manager. Space unit is dp.
+     * You can custom you line by extends [BaseLine]
+     *
+     * 3 view setting
+     *
+     * 4 nodes data setting
+     *
+     * 5 if you want to edit the map, then get and use and tree view editor
+     *
+     * 6 you own others jobs
+     */
+    private fun initWidgets() {
+        //1 customs adapter
+        val adapter = ItemAdapter()
+        //val adapter = ItemInfoTreeViewAdapter()
 
-        grade1 = Item(this, "1학년", "Hello", true)
-        grade2 = Item(this, "2학년", "Hello", true)
-        grade3 = Item(this, "3학년", "Hello", true)
-        grade4 = Item(this, "4학년", "Hello", true)
+        //2 configure layout manager; unit dp
+        val treeLayoutManager = getTreeLayoutManager()
 
-        mindMappingView.addItem(
-            grade1, rootNode, 200, 15, ItemLocation.TOP, false, null)
-        mindMappingView.addItem(
-            grade2, rootNode, 200, 15, ItemLocation.LEFT, false, null)
-        mindMappingView.addItem(
-            grade3, rootNode, 200, 15, ItemLocation.RIGHT, false, null)
-        mindMappingView.addItem(
-            grade4, rootNode, 200, 15, ItemLocation.BOTTOM, false, null)
+        //3 view setting
+        binding.mapView.adapter = adapter
+        binding.mapView.setTreeLayoutManager(treeLayoutManager)
 
+        //4 nodes data setting
+        val root: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("root", "root", null))
+        val mapView: TreeModel<ItemInfo> = TreeModel(root)
 
-        grade1.setOnTouchListener{ _, motionEvent ->
-            mItem = grade1
-            detector.onTouchEvent(motionEvent)
-            true
-        }
-        grade2.setOnTouchListener{ _, motionEvent ->
-            mItem = grade2
-            detector.onTouchEvent(motionEvent)
-            true
-        }
-        grade3.setOnTouchListener{ _, motionEvent ->
-            mItem = grade3
-            detector.onTouchEvent(motionEvent)
-            true
-        }
-        grade4.setOnTouchListener{ _, motionEvent ->
-            mItem = grade4
-            detector.onTouchEvent(motionEvent)
-            true
-        }
+        val grade1: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("grade1", "1학년", null))
+        val grade2: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("grade2", "2학년", null))
+        val grade3: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("grade3", "3학년", null))
+        val grade4: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("grade4", "4학년", null))
+
+        mapView.addNode(root, grade1, grade2, grade3, grade4)
+
+        adapter.treeModel = mapView
+
+        //5 get an editor. Note: an adapter must set before get an editor.
+        val editor: TreeViewEditor = binding.mapView.editor
+
+        //6 you own others jobs
+        itemEvent(editor, adapter)
     }
 
-    private fun nodeChildEvent(item: Item): View.OnTouchListener? {
-        var longClick: Boolean
-        var clickCount = 0 // 클릭 카운트가 뷰 하나에만 적용되게
+    private fun itemEvent(editor: TreeViewEditor, adapter: ItemAdapter) {
 
-        return View.OnTouchListener { _, motionEvent ->
-            when (motionEvent.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    longClick = false
-                    Log.d("checkDown", "${item.javaClass.name}")
-                    item.setOnLongClickListener {
-                        longClick = true
-
-                        Log.d("checkLongClick", "${item.javaClass.name}")
-                        val dragItem = ClipData.Item(item.tag as? CharSequence)
-                        val dragData = ClipData(
-                            item.tag as? CharSequence,
-                            arrayOf(ClipDescription.MIMETYPE_TEXT_INTENT),
-                            dragItem
-                        )
-                        val myShadow = MyDragShadowBuilder(item)
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            item.startDragAndDrop(
-                                dragData,
-                                myShadow,
-                                null, 0
-                            )
+        adapter.setOnItemListener { item, node ->
+            Toast.makeText(this, "you click the head of $node $item", Toast.LENGTH_SHORT).show()
+            targetNode = node
+            binding.bottomNavigationView.visibility = View.VISIBLE
+            binding.bottomNavigationView.run {
+                setOnItemSelectedListener { item ->
+                    when (item.itemId) {
+                        R.id.bottomMenu1 -> {
+                            setItem(editor, node)
+                            true
                         }
-                        if (longClick) {
-                            mindMappingView.setOnDragListener { view, dragEvent ->
-                                Log.d("checkDrag", "${item.javaClass.name}")
-                                when (dragEvent.action) {
-                                    DragEvent.ACTION_DRAG_STARTED -> {
-                                        Log.d("checkDragStart", "${item.javaClass.name}")
-                                    }
-                                    DragEvent.ACTION_DROP -> { // 드롭 기능 구현해보자
-                                        val it = dragEvent.javaClass
-                                        val cd = dragEvent.clipData.itemCount
-
-                                        val map = view as MindMappingView
-                                        for (index in 0 until map.childCount) {
-                                            val i = (map.getChildAt(index) as Item)
-
-                                            val x = dragEvent.x
-                                            val y = dragEvent.y
-
-                                            if ((x>i.x - i.width && x<i.x + i.width) && (y>i.y - i.height && y<i.y + i.height)) {
-                                                Log.d("checkDropppp", "${index}")
-                                            }
-                                        }
-
-                                        Log.d(
-                                            "checkDrop",
-                                            "${item.javaClass.name} ${view.javaClass.name} ${cd} ${it}"
-                                        )
-                                    }
-                                }
-                                true
-                            }
-                        } else {
-                            ++clickCount
+                        R.id.bottomMenu2 -> {
+                            true
                         }
-                        true
+                        R.id.bottomMenu3 -> {
+                            true
+                        }
+                        else -> {
+                            true
+                        }
                     }
                 }
             }
-            false
         }
-    }
 
-    private fun returnItem(position: Int): Item {
-        val newItem = Item(this@MindMapActivity, "Child", "Hi", true)
-        when (position) {
-            0 -> childNodeTop.add(newItem)
-            1 -> childNodeLeft.add(newItem)
-            2 -> childNodeRight.add(newItem)
-            3 -> childNodeBottom.add(newItem)
-            else -> {}
+        adapter.setOnItemLongListener { item, node ->
+            editor.requestMoveNodeByDragging(true)
         }
-        return newItem
-    }
 
-    private fun addItem(parent: Item, child: Item, position: Int) { // mindMappingView 아이템 추가
-        child.id // 아이디 설정 어케하지
-        mindMappingView.addItem(child, parent, 150,
-            20, position, true, null)
-        child.setOnTouchListener{ _, motionEvent ->
-            mItem = child
-            detector.onTouchEvent(motionEvent)
-            true
+        //treeView control listener
+        val token = Object()
+        val dismissRun = Runnable {
+            binding.scalePercent.visibility = View.GONE
         }
-        nodePosition(parent, child, position) // item 위치 설정
-        binding.bottomNavigationView.visibility = View.INVISIBLE
-    }
 
-    private fun bottomEvent(node: Item, position: Int) {
-        binding.bottomNavigationView.visibility = View.VISIBLE
-        binding.bottomNavigationView.run {
-            val mItem = returnItem(position) // returnItem 함수 호출
-            setOnItemSelectedListener { item ->
-                when (item.itemId) {
-                    R.id.childNodeAdd -> {
-                        addItem(node, mItem, position)
-                        true
+        binding.mapView.setTreeViewControlListener(object: TreeViewControlListener {
+            override fun onScaling(state: Int, percent: Int) {
+                binding.scalePercent.visibility = View.VISIBLE
+                when (state) {
+                    TreeViewControlListener.MAX_SCALE -> {
+                        binding.scalePercent.text = "MAX"
+                    }
+                    TreeViewControlListener.MIN_SCALE -> {
+                        binding.scalePercent.text = "MIN"
                     }
                     else -> {
-                        true
+                        binding.scalePercent.text = "$percent%"
                     }
                 }
+                handler.removeCallbacksAndMessages(token)
+                handler.postAtTime(dismissRun, token, SystemClock.uptimeMillis() + 2000)
             }
-        }
-    }
 
-    private fun nodePosition(parent: Item, child: Item, position: Int) { // item position 재설정
-        child.x -= rootNode.x
-        if (position == 1 || position == 2) {
-            when {
-                parent.leftChildItems.size > 1 -> {
-                    child.y -= rootNode.y
-                }
-                parent.rightChildItems.size > 1 -> {
-                    child.y -= rootNode.y
-                }
-            }
-        } else {
-            child.y -= rootNode.y
-        }
-        childNodeNum[position]++
-    }
-
-    private fun popupEventR(node: Item) {
-        val popUp = PopupMenu(node.context, node) //v는 클릭된 뷰를 의미
-        popUp.menuInflater.inflate(R.menu.popup_menu_root, popUp.menu)
-        popUp.setOnMenuItemClickListener { items ->
-            when (items.itemId) {
-                R.id.popupMenuR1 -> { // 노드 내용 변경, Edit 버튼
-                    editNode(node)
-                }
-                R.id.popupMenuR2 -> {
-                }
-                R.id.popupMenuR3 -> {
-                }
-                else -> {
-                }
-            }
-            false
-        }
-        popUp.show() //Popup Menu 보이기
-
-    }
-
-    private fun popupEvent(node: Item) {
-        val popUp = PopupMenu(node.context, node) //v는 클릭된 뷰를 의미
-        popUp.menuInflater.inflate(R.menu.popup_menu, popUp.menu)
-        popUp.setOnMenuItemClickListener { items ->
-            when (items.itemId) {
-                R.id.popupMenuR1 -> { // 노드 내용 변경, Edit 버튼
-                    editNode(node)
-                }
-                R.id.popupMenu2 -> { // 노드 내용 삭제, Delete 버튼
-                    deleteNode(node)
-                }
-                R.id.popupMenuR2 -> {
-                }
-                R.id.popupMenuR3 -> {
-                }
-                else -> {
-                }
-            }
-            false
-        }
-        popUp.show() //Popup Menu 보이기
-    }
-
-    private fun editNode(node: Item) {
-        binding.editNode.setText(node.title.text)
-        binding.editNode.visibility = View.VISIBLE
-        binding.editNode.setOnKeyListener(object : View.OnKeyListener {
-            override fun onKey(v: View?, keyCode: Int, event: KeyEvent): Boolean {
-                //Enter key Action
-                if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                    //키패드 내리기
-                    val imm: InputMethodManager =
-                        getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.hideSoftInputFromWindow(
-                        binding.editNode.windowToken, 0
-                    )
-                    //처리
-                    node.title.text = binding.editNode.text
-                    binding.editNode.visibility = View.INVISIBLE
-                    return true
-                }
-                return false
+            override fun onDragMoveNodesHit(
+                draggingNode: NodeModel<*>?,
+                hittingNode: NodeModel<*>?,
+                draggingView: View?,
+                hittingView: View?
+            ) {
+                Log.d(
+                    "Debug_Tag",
+                    "onDragMoveNodesHit: draging[$draggingNode]hittingNode[$hittingNode]"
+                )
             }
         })
     }
 
-    private fun deleteNode(node: Item) {
-        mindMappingView.removeView(node)
+    private fun setItem(editor: TreeViewEditor, node: NodeModel<ItemInfo>) {
+        val setWindow: View =
+            LayoutInflater.from(this@MindMapActivity).inflate(R.layout.window_item_set,null)
+        val itemSetWindow = PopupWindow(
+            setWindow,
+            ((applicationContext.resources.displayMetrics.widthPixels) * 0.8).toInt(),
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+
+        val setButton: Button = setWindow.findViewById(R.id.itemSetButton)
+        val setTitle: EditText = setWindow.findViewById(R.id.setTitleView)
+        val setContent: EditText = setWindow.findViewById(R.id.setContentView)
+
+        itemSetWindow.isFocusable =true
+        itemSetWindow.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+        itemSetWindow.update()
+        itemSetWindow.showAtLocation(setWindow, Gravity.CENTER,0,0)
+
+        itemSetWindow.isOutsideTouchable =true
+        itemSetWindow.setTouchInterceptor {_, motionEvent ->
+            if(motionEvent.action == MotionEvent.ACTION_OUTSIDE){
+                itemSetWindow.dismiss()
+            }
+            false
+        }
+
+        setButton.setOnClickListener {
+            val title = setTitle.text.toString()
+            val content = setContent.text.toString()
+
+            if (title != "" && content != "") {
+                val item: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("id", title, content))
+                editor.addChildNodes(node, item)
+                itemSetWindow.dismiss()
+            } else {
+                Toast.makeText(
+                    this, "제목(내용)이 비어있습니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
+    private fun getTreeLayoutManager(): TreeLayoutManager {
+        val space_50dp = 30
+        val space_20dp = 80
+        val line = getLine()
+        //return new RightTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new LeftTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new CompactRightTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return CompactLeftTreeLayoutManager(this,space_50dp,space_20dp,line);
+        return HorizonLeftAndRightLayoutManager(this,space_50dp,space_20dp,line);
+        //return CompactHorizonLeftAndRightLayoutManager(this,space_50dp,space_20dp,line);
+        //return new DownTreeLayoutManager(this,space_50dp,space_20dp,line);
+
+        //return UpTreeLayoutManager(this, space_50dp, space_20dp, line)
+        //return CompactDownTreeLayoutManager(this, space_50dp, space_20dp, line)
+        //return new CompactUpTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new CompactVerticalUpAndDownLayoutManager(this,space_50dp,space_20dp,line);
+        //return CompactVerticalUpAndDownLayoutManager(this, space_50dp, space_20dp, line)
+        //return VerticalUpAndDownLayoutManager(this,space_50dp,space_20dp,line);
+        //return CompactRingTreeLayoutManager(this,space_50dp,space_20dp,line);
+        //return new ForceDirectedTreeLayoutManager(this,line);
+    }
+
+    private fun getLine(): BaseLine {
+        //return new SmoothLine();
+        return StraightLine(Color.parseColor("#055287"), 2)
+        //return new PointedLine();
+        //return new DashLine(Color.parseColor("#F1286C"),3);
+        //return new AngledLine();
+    }
 }
+/*
 
-private class MyDragShadowBuilder(v: View) : View.DragShadowBuilder(v) {
+    fun doYourOwnJobs(editor: TreeViewEditor, adapter: ItemAdapter) {
+        //drag to move node
+        binding.dragEditModeRd.setOnCheckedChangeListener { v, isChecked ->
+            editor.requestMoveNodeByDragging(isChecked)
+        }
 
-    private val shadow = ColorDrawable(Color.LTGRAY)
+        //focus, means that tree view fill center in your window viewport
+        binding.viewCenterBt.setOnClickListener { v -> editor.focusMidLocation() }
 
-    // Defines a callback that sends the drag shadow dimensions and touch point
-    // back to the system.
-    override fun onProvideShadowMetrics(size: Point, touch: Point) {
+        //add some nodes
+        binding.addNodesBt.setOnClickListener { v ->
+            if (targetNode == null) {
+                Toast.makeText(this, "Ohs, your targetNode is null", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            val a: NodeModel<ItemInfo> =
+                NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_10,
+                    "add-" + atomicInteger.getAndIncrement()))
+            val b: NodeModel<ItemInfo> =
+                NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_11,
+                    "add-" + atomicInteger.getAndIncrement()))
+            val c: NodeModel<ItemInfo> =
+                NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_14,
+                    "add-" + atomicInteger.getAndIncrement()))
+            editor.addChildNodes(targetNode, a, b, c)
 
-        // Set the width of the shadow to half the width of the original View.
-        val width: Int = view.width
 
-        // Set the height of the shadow to half the height of the original View.
-        val height: Int = view.height
+            //add to remove demo cache
+            removeCache.push(targetNode)
+            targetNode = b
+        }
 
-        // The drag shadow is a ColorDrawable. This sets its dimensions to be the
-        // same as the Canvas that the system provides. As a result, the drag shadow
-        // fills the Canvas.
-        shadow.setBounds(0, 0, width, height)
+        //remove node
+        binding.removeNodeBt.setOnClickListener { v ->
+            if (removeCache.isEmpty()) {
+                Toast.makeText(this,
+                    "Ohs, demo removeCache is empty now!! Try to add some nodes firstly!!",
+                    Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            val toRemoveNode: NodeModel<ItemInfo>? = removeCache.pop()
+            targetNode = toRemoveNode!!.getParentNode()
+            editor.removeNode(toRemoveNode)
+        }
+        adapter.setOnItemListener { item, node ->
+            val ItemInfo: ItemInfo = node.getValue()
+            Toast.makeText(this, "you click the head of $ItemInfo", Toast.LENGTH_SHORT).show()
+        }
 
-        // Set the size parameter's width and height values. These get back to
-        // the system through the size parameter.
-        size.set(width, height)
 
-        // Set the touch point's position to be in the middle of the drag shadow.
-        touch.set(width / 2, height / 2)
+        //treeView control listener
+        val token = Any()
+        val dismissRun = Runnable {
+            binding.scalePercent.setVisibility(View.GONE)
+        }
+        binding.baseTreeView.setTreeViewControlListener(object : TreeViewControlListener {
+            override fun onScaling(state: Int, percent: Int) {
+                Log.e(TAG, "onScaling: $state  $percent")
+                binding.scalePercent.setVisibility(View.VISIBLE)
+                if (state == TreeViewControlListener.MAX_SCALE) {
+                    binding.scalePercent.setText("MAX")
+                } else if (state == TreeViewControlListener.MIN_SCALE) {
+                    binding.scalePercent.setText("MIN")
+                } else {
+                    binding.scalePercent.setText("$percent%")
+                }
+                handler.removeCallbacksAndMessages(token)
+                handler.postAtTime(dismissRun, token, SystemClock.uptimeMillis() + 2000)
+            }
+
+            fun onDragMoveNodesHit(
+                draggingNode: NodeModel<*>,
+                hittingNode: NodeModel<*>,
+                draggingView: View?,
+                hittingView: View?,
+            ) {
+                Log.e(TAG,
+                    "onDragMoveNodesHit: draging[$draggingNode]hittingNode[$hittingNode]")
+            }
+        })
     }
 
-    // Defines a callback that draws the drag shadow in a Canvas that the system
-    // constructs from the dimensions passed to onProvideShadowMetrics().
-    override fun onDrawShadow(canvas: Canvas) {
 
-        // Draw the ColorDrawable on the Canvas passed in from the system.
-        shadow.draw(canvas)
-    }
-}
+
+    private fun setData(adapter: ItemInfoTreeViewAdapter) {
+        //root
+        val root: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_01, "-root-"))
+
+
+        //child nodes
+        val sub0: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_02, "sub00"))
+        val sub1: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_03, "sub01"))
+        val sub2: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_04, "sub02"))
+        val sub3: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_05, "sub03"))
+        val sub4: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_06, "sub04"))
+        val sub5: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_07, "sub05"))
+        val sub6: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_08, "sub06"))
+        val sub7: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_09, "sub07"))
+        val sub8: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_10, "sub08"))
+        val sub9: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_11, "sub09"))
+        val sub10: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_12, "sub10"))
+        val sub11: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_13, "sub11"))
+        val sub12: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_14, "sub12"))
+        val sub13: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_15, "sub13"))
+        val sub14: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_13, "sub14"))
+        val sub15: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_14, "sub15"))
+        val sub16: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_15, "sub16"))
+        val sub17: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_08, "sub17"))
+        val sub18: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_09, "sub18"))
+        val sub19: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_10, "sub19"))
+        val sub20: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_02, "sub20"))
+        val sub21: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_03, "sub21"))
+        val sub22: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_04, "sub22"))
+        val sub23: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_05, "sub23"))
+        val sub24: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_06, "sub24"))
+        val sub25: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_07, "sub25"))
+        val sub26: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_08, "sub26"))
+        val sub27: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_09, "sub27"))
+        val sub28: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_10, "sub28"))
+        val sub29: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_11, "sub29"))
+        val sub30: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_02, "sub30"))
+        val sub31: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_03, "sub31"))
+        val sub32: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_04, "sub32"))
+        val sub33: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_05, "sub33"))
+        val sub34: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_06, "sub34"))
+        val sub35: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_07, "sub35"))
+        val sub36: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_08, "sub36"))
+        val sub37: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_09, "sub37"))
+        val sub38: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_10, "sub38"))
+        val sub39: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_11, "sub39"))
+        val sub40: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_02, "sub40"))
+        val sub41: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_03, "sub41"))
+        val sub42: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_04, "sub42"))
+        val sub43: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_05, "sub43"))
+        val sub44: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_06, "sub44"))
+        val sub45: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_07, "sub45"))
+        val sub46: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_08, "sub46"))
+        val sub47: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_09, "sub47"))
+        val sub48: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_10, "sub48"))
+        val sub49: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_11, "sub49"))
+        val sub50: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_05, "sub50"))
+        val sub51: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_07, "sub51"))
+        val sub52: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_07, "sub52"))
+        val sub53: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_07, "sub53"))
+
+        //build relationship
+        treeModel.addNode(root, sub0, sub1, sub3, sub4)
+        treeModel.addNode(sub3, sub12, sub13)
+        treeModel.addNode(sub1, sub2)
+        treeModel.addNode(sub0, sub34, sub5, sub38, sub39)
+        treeModel.addNode(sub4, sub6)
+        treeModel.addNode(sub5, sub7, sub8)
+        treeModel.addNode(sub6, sub9, sub10, sub11)
+        treeModel.addNode(sub11, sub14, sub15)
+        treeModel.addNode(sub10, sub40)
+        treeModel.addNode(sub40, sub16)
+        //treeModel.addNode(sub8,sub17,sub18,sub19,sub20,sub21,sub22,sub23,sub41,sub42,sub43,sub44);
+        treeModel.addNode(sub9, sub47, sub48)
+        //treeModel.addNode(sub16,sub24,sub25,sub26,sub27,sub28,sub29,sub30,sub46,sub45);
+        treeModel.addNode(sub47, sub49)
+        treeModel.addNode(sub12, sub37)
+        treeModel.addNode(sub0, sub36)
+
+        //treeModel.addNode(sub15,sub31,sub32,sub33,sub34,sub35,sub36,sub37);
+        //treeModel.addNode(sub2,sub40,sub41,sub42,sub43,sub44,sub45,sub46);
+        //mark
+
+        //set data*/
