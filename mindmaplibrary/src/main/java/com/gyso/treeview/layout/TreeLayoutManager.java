@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -19,6 +20,7 @@ import com.gyso.treeview.model.TreeModel;
 import com.gyso.treeview.util.DensityUtils;
 import com.gyso.treeview.util.TreeViewLog;
 import com.gyso.treeview.util.ViewBox;
+
 import java.util.Map;
 
 /**
@@ -124,8 +126,8 @@ public abstract class TreeLayoutManager {
     }
 
     public void setViewport(int winHeight, int winWidth) {
-        this.winHeight =winHeight;
-        this.winWidth = winWidth;
+        //this.winHeight = winHeight;
+        //this.winWidth = winWidth;
     }
 
     public abstract void  calculateByLayoutAlgorithm(TreeModel<?> mTreeModel);
@@ -163,16 +165,18 @@ public abstract class TreeLayoutManager {
     protected boolean layoutAnimatePrepare(NodeModel<?> currentNode,
                                            View currentNodeView,
                                            ViewBox finalLocation,
-                                           TreeViewContainer treeViewContainer){
+                                           TreeViewContainer treeViewContainer) {
+
+        Log.d("Debug_Log", "TreeLayoutManager/layoutAnimatePrepare: ");
         Object targetNodeTag = treeViewContainer.getTag(R.id.target_node);
-        if(targetNodeTag instanceof NodeModel){
+        if (targetNodeTag instanceof NodeModel) {
             currentNodeView.setTag(R.id.node_final_location, finalLocation);
-            if(targetNodeTag.equals(currentNode)){
-                TreeViewLog.e(TAG,"Get target location!");
+            if (targetNodeTag.equals(currentNode)) {
+                TreeViewLog.e(TAG, "Get target location!");
                 treeViewContainer.setTag(R.id.target_node_final_location, finalLocation);
 
                 //remove views
-                if(!animateRemoveNodes(treeViewContainer, finalLocation)){
+                if (!animateRemoveNodes(treeViewContainer, finalLocation)) {
                     //TODO remove nodes directly
                     TreeViewLog.e(TAG,"Has remove nodes directly!");
                 }
@@ -293,6 +297,7 @@ public abstract class TreeLayoutManager {
                             if(finalLocation!=null){
                                 view.layout(finalLocation.left, finalLocation.top, finalLocation.right, finalLocation.bottom);
                             }
+
                             view.setTag(R.id.node_pre_location,null);
                             view.setTag(R.id.node_delta_location,null);
                             view.setTag(R.id.node_final_location, null);
@@ -324,6 +329,7 @@ public abstract class TreeLayoutManager {
             removeAnimator.setDuration(TreeViewContainer.DEFAULT_FOCUS_DURATION);
             removeAnimator.addUpdateListener(value -> {
                 for (NodeModel<?> nodeToRemove : removedViewMap.keySet()) {
+
                     View view = removedViewMap.get(nodeToRemove);
                     ViewBox relativeLocation = relativeLocationMap.get(nodeToRemove);
                     ViewBox location = targetLocation.add(relativeLocation);

@@ -252,7 +252,7 @@ public class NodeModel<T> implements Serializable {
         NodeModel<?> parentNode = getParentNode();
 
         while (parentNode!=null){
-            parentNode.leafCount -=removeCount;
+            parentNode.leafCount -= removeCount;
             //if current become a leaf
             if(childNodes.isEmpty()){
                 parentNode.leafCount++;

@@ -18,4 +18,5 @@ public interface TreeViewControlListener {
     int MAX_SCALE  = 1;
     void onScaling(int state, int percent);
     void onDragMoveNodesHit(@Nullable NodeModel<?> draggingNode, @Nullable NodeModel<?> hittingNode, @Nullable View draggingView, @Nullable View hittingView);
+    void onDragMoveNodesEnd(@Nullable NodeModel<?> draggingNode, @Nullable NodeModel<?> hittingNode, @Nullable View draggingView, @Nullable View hittingView);
 }

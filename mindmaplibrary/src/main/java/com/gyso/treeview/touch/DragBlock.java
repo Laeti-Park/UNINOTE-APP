@@ -1,12 +1,8 @@
 package com.gyso.treeview.touch;
 
 import android.graphics.PointF;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.SystemClock;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.view.animation.Interpolator;
 import android.widget.OverScroller;
 
@@ -19,7 +15,6 @@ import com.gyso.treeview.util.ViewBox;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -83,6 +78,7 @@ public class DragBlock {
         }
         this.isDragging = true;
         for (int i = 0; i < tmp.size(); i++) {
+            Log.d("Debug_Log", "DragBlock/drag: dragged");
             View view = tmp.get(i);
             view.offsetLeftAndRight(dx);
             view.offsetTopAndBottom(dy);

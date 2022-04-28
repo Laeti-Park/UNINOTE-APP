@@ -58,20 +58,27 @@ interface APIS_login {
     ):Call<PostModel>
 
     @FormUrlEncoded
-    @POST(MyApp.node_save_url)
-    fun node_save(
-        @Field("nodeID") nodeID: String,
-        @Field("nodeY") nodeY: Int,
-        @Field("nodeX") nodeX: Int,
+    @POST(MyApp.item_save_url)
+    fun item_save(
+        @Field("itemID") itemID: String,
         @Field("userID") userID: String,
-        @Field("nodeContect") nodeContect: String,
-        @Field("nodeCount") nodeCount: Int
+        @Field("itemNum") itemNum: Int,
+        @Field("itemTitle") itemTitle: String,
+        @Field("itemContent") itemContent: String?,
+        //@Field("itemX") itemX: String,
+        //@Field("itemY") itemY: String,
+        @Field("mode") mode: String,
     ): Call<PostModel>
 
+    @FormUrlEncoded
+    @POST(MyApp.item_load_url)
+    fun item_load(
+        @Field("userID") userID: String
+    ): Call<List<ItemInfo>>
 
     companion object { // static 처럼 공유객체로 사용가능함. 모든 인스턴스가 공유하는 객체로서 동작함.
         //서버 IP만 입력해주세요~
-        private const val BASE_URL = "http://220.118.54.17"
+        private const val BASE_URL = "http://192.168.0.9"
         fun create(): APIS_login {
             val gson: Gson = GsonBuilder().setLenient().create();
             return Retrofit.Builder()

@@ -15,53 +15,42 @@ import java.util.concurrent.atomic.AtomicInteger
 import android.os.SystemClock
 import android.util.Log
 import android.view.*
-import android.widget.Button
-import android.widget.EditText
-import android.widget.PopupWindow
-import android.widget.Toast
+import android.widget.*
+import androidx.core.view.isVisible
+import androidx.core.view.size
 import com.gyso.treeview.layout.*
 
 import com.gyso.treeview.listener.TreeViewControlListener
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 
 class MindMapActivity : AppCompatActivity() {
     val api = APIS_login.create()
 
-    val TAG = MainActivity::class.java.simpleName
     private lateinit var binding: ActivityMindMapBinding
-    private lateinit var removeCache: Stack<NodeModel<ItemInfo>>
-    private var targetNode: NodeModel<ItemInfo>? = null
     private val atomicInteger = AtomicInteger()
     private val handler = Handler()
     private var parentToRemoveChildren: NodeModel<ItemInfo>? = null
+    private lateinit var userID : String
+    private var itemMaxNum = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMindMapBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        userID = intent.getStringExtra("ID").toString()
+        Log.d("Debug_Log", "MindMapActivity/userID: ${userID}")
+
         //demo init
         initWidgets()
     }
 
-    /**
-     * To use a tree view, you should do 6 steps as follows:
-     * 1 customs adapter
-     *
-     * 2 configure layout manager. Space unit is dp.
-     * You can custom you line by extends [BaseLine]
-     *
-     * 3 view setting
-     *
-     * 4 nodes data setting
-     *
-     * 5 if you want to edit the map, then get and use and tree view editor
-     *
-     * 6 you own others jobs
-     */
     private fun initWidgets() {
         //1 customs adapter
         val adapter = ItemAdapter()
-        //val adapter = ItemInfoTreeViewAdapter()
 
         //2 configure layout manager; unit dp
         val treeLayoutManager = getTreeLayoutManager()
@@ -71,46 +60,132 @@ class MindMapActivity : AppCompatActivity() {
         binding.mapView.setTreeLayoutManager(treeLayoutManager)
 
         //4 nodes data setting
-        val root: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("root", "root", null))
+        val root: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("root", "root", null, null))
         val mapView: TreeModel<ItemInfo> = TreeModel(root)
 
-        val grade1: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("grade1", "1학년", null))
-        val grade2: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("grade2", "2학년", null))
-        val grade3: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("grade3", "3학년", null))
-        val grade4: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("grade4", "4학년", null))
+        val grade1: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("grade1", "1학년", null, null))
+        val grade2: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("grade2", "2학년", null, null))
+        val grade3: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("grade3", "3학년", null, null))
+        val grade4: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("grade4", "4학년", null, null))
 
-        mapView.addNode(root, grade1, grade2, grade3, grade4)
+        mapView.addNode(root, grade3, grade4, grade1, grade2)
 
         adapter.treeModel = mapView
 
         //5 get an editor. Note: an adapter must set before get an editor.
         val editor: TreeViewEditor = binding.mapView.editor
+        val mapItems = HashMap<String, NodeModel<ItemInfo>>()
+        api.item_load(userID).enqueue(object : Callback<List<ItemInfo>> {
+            override fun onResponse(call: Call<List<ItemInfo>>, response: Response<List<ItemInfo>>) {
+                Log.d("onResponse", "MindMapActivity item_load: 리스폰 성공")
+                if(response.body() != null) {
+                    for(i in response.body()!!) {
+                        val item = NodeModel<ItemInfo>(i)
+                        val childID = i.getItemID().split("_")[1]
+                        mapItems.put(childID, item)
+                    }
+
+                    for(i in response.body()!!) {
+                        Log.d("Debug_Log", "getItemID: ${i.getItemID()}")
+                        val parentID = i.getItemID().split("_")[0]
+                        val childID = i.getItemID().split("_")[1]
+                        when(parentID) {
+                            "grade1" -> {
+                                editor.addChildNodes(grade1, mapItems.get(childID))
+                            }
+                            "grade2" -> {
+                                editor.addChildNodes(grade2, mapItems.get(childID))
+                            }
+                            "grade3" -> {
+                                editor.addChildNodes(grade3, mapItems.get(childID))
+                            }
+                            "grade4" -> {
+                                editor.addChildNodes(grade4, mapItems.get(childID))
+                            }
+                            else -> {
+                                editor.addChildNodes(mapItems.get(parentID), mapItems.get(childID))
+                                Log.d("Debug_Log", "addChildNodes: $parentID $childID")
+                            }
+                        }
+                        itemMaxNum = (if (i.getNum() != null) i.getNum()!! else throw NullPointerException("Expression 'i.getNum()' must not be null"))
+                        itemMaxNum++
+                        Log.d("Debug_Log", "getmapItems: ${mapItems}")
+                        editor.focusMidLocation()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<List<ItemInfo>>, t: Throwable) {
+                Log.d("onFailure", "MindMapActivity item_load: 리스폰 실패 : $t")
+
+            }
+        })
 
         //6 you own others jobs
         itemEvent(editor, adapter)
     }
 
     private fun itemEvent(editor: TreeViewEditor, adapter: ItemAdapter) {
+        editor.container.isAnimateAdd = true
 
-        adapter.setOnItemListener { item, node ->
-            Toast.makeText(this, "you click the head of $node $item", Toast.LENGTH_SHORT).show()
-            targetNode = node
-            binding.bottomNavigationView.visibility = View.VISIBLE
-            binding.bottomNavigationView.run {
-                setOnItemSelectedListener { item ->
-                    when (item.itemId) {
-                        R.id.bottomMenu1 -> {
-                            setItem(editor, node)
-                            true
-                        }
-                        R.id.bottomMenu2 -> {
-                            true
-                        }
-                        R.id.bottomMenu3 -> {
-                            true
-                        }
-                        else -> {
-                            true
+        adapter.setOnItemListener { view, node ->
+            val id = node.value.getItemID()
+            if(id != "root") {
+                val visible = id != "grade1" && id != "grade2" && id != "grade3" && id != "grade4"
+                binding.bottomNavigationView.menu.findItem(R.id.bottomMenu2).isVisible = visible
+                binding.bottomNavigationView.menu.findItem(R.id.bottomMenu3).isVisible = visible
+                binding.bottomNavigationView.visibility = View.VISIBLE
+                binding.bottomNavigationView.run {
+                    setOnItemSelectedListener { item ->
+                        when (item.itemId) {
+                            R.id.bottomMenu1 -> {
+                                val parent =
+                                    if(visible) node.value.getItemID().split("_")[1]
+                                    else node.value.getItemID().split("_")[0]
+                                val item: NodeModel<ItemInfo> =
+                                    NodeModel<ItemInfo>(ItemInfo(
+                                        "${parent}_item${itemMaxNum}"
+                                        , "ChildNode", "", itemMaxNum++))
+                                Log.d("Debug_Log", "bottomMenu1_childNode: ${item.value.getItemID()}")
+                                editor.addChildNodes(node, item)
+                                saveDB(item, null, "insert")
+                                binding.bottomNavigationView.isVisible = false
+                                true
+                            }
+                            R.id.bottomMenu2 -> {
+                                setItem(node, editor)
+                                binding.bottomNavigationView.isVisible = false
+                                true
+                            }
+                            R.id.bottomMenu3 -> {
+                                val parentNode = node.getParentNode()
+                                val parentName = node.value.getItemID().split("_")[0]
+                                val parent =
+                                    if(parentName != "grade1" &&
+                                        parentName != "grade2" &&
+                                        parentName != "grade3" &&
+                                        parentName != "grade4") node.value.getItemID().split("_")[1]
+                                    else node.value.getItemID().split("_")[0]
+                                val children = node.getChildNodes()
+                                saveDB(node, view, "delete")
+                                editor.removeNode(node)
+                                for (i in 0 until node.getChildNodes().size) {
+                                    val child = children.pop().value
+                                    val childID = child.getItemID().split("_")[1]
+                                    val childNode: NodeModel<ItemInfo> =
+                                        NodeModel<ItemInfo>(ItemInfo(
+                                            "${parent}_$childID",
+                                            "${child.getTitle()}", "${child.getContent()}", child.getNum()))
+                                    saveDB(childNode, null, "update")
+                                    Log.d("Debug_Log", "bottomMenu3_childNode: ${childNode.value.getItemID()}")
+                                    editor.addChildNodes(parentNode, childNode)
+                                }
+                                binding.bottomNavigationView.isVisible = false
+                                true
+                            }
+                            else -> {
+                                true
+                            }
                         }
                     }
                 }
@@ -118,7 +193,19 @@ class MindMapActivity : AppCompatActivity() {
         }
 
         adapter.setOnItemLongListener { item, node ->
-            editor.requestMoveNodeByDragging(true)
+            if(node.value.getItemID() != "root" &&
+                node.value.getItemID() != "grade1" &&
+                node.value.getItemID() != "grade2" &&
+                node.value.getItemID() != "grade3" &&
+                node.value.getItemID() != "grade4")
+                    editor.requestMoveNodeByDragging(true)
+        }
+
+        adapter.setOnItemDoubleListener { item, node ->
+            val id = node.value.getItemID()
+            if(id != "root" && id != "grade1" && id != "grade2" && id != "grade3" && id != "grade4")
+            editor.requestMoveNodeByDragging(false)
+            setItem(node, editor)
         }
 
         //treeView control listener
@@ -151,15 +238,93 @@ class MindMapActivity : AppCompatActivity() {
                 draggingView: View?,
                 hittingView: View?
             ) {
-                Log.d(
-                    "Debug_Tag",
-                    "onDragMoveNodesHit: draging[$draggingNode]hittingNode[$hittingNode]"
-                )
+                if (draggingNode !=null && hittingNode != null) {
+                    Log.d(
+                        "Debug_Log",
+                        "onDragMoveNodesHit: draging[${(draggingNode.value as ItemInfo).getItemID()}]" +
+                                "hittingNode[${(hittingNode.value as ItemInfo).getItemID()}]"
+                    )
+                }
+            }
+
+            override fun onDragMoveNodesEnd(
+                draggingNode: NodeModel<*>?,
+                hittingNode: NodeModel<*>?,
+                draggingView: View?,
+                hittingView: View?
+            ) {
+                if (draggingNode != null && hittingNode != null) {
+                    Log.d(
+                        "Debug_Log",
+                        "onDragMoveNodesEnd: draging[${(draggingNode.value as ItemInfo).getItemID()}]" +
+                                "hittingNode[${(hittingNode.value as ItemInfo).getItemID()}]"
+                    )
+                    val dNode = draggingNode.value as ItemInfo
+                    val hNode = hittingNode.value as ItemInfo
+                    val parent =
+                        if(hNode.getItemID() != "grade1" && hNode.getItemID() != "grade2" &&
+                            hNode.getItemID() != "grade3" && hNode.getItemID() != "grade4")
+                                hNode.getItemID().split("_")[1]
+                        else hNode.getItemID().split("_")[0]
+                    dNode.setItemID("${parent}_${dNode.getItemID().split("_")[1]}")
+                    if (draggingView != null) {
+                        saveDB(draggingNode as NodeModel<ItemInfo>, draggingView, "update")
+                    }
+                }
             }
         })
+
+        binding.focusMidButton.setOnClickListener {
+            editor.focusMidLocation()
+        }
+
+        binding.popularLayout.setOnClickListener {
+            val visible: Boolean = binding.mapViews.visibility == View.VISIBLE &&
+                    binding.mapRecommend.visibility == View.VISIBLE
+            Log.d("Debug_Log", "popularLayout: $visible")
+            if (!visible) {
+                binding.mapViews.visibility = View.VISIBLE
+                binding.mapRecommend.visibility = View.VISIBLE
+            } else {
+                binding.mapViews.visibility = View.GONE
+                binding.mapRecommend.visibility = View.GONE
+            }
+        }
     }
 
-    private fun setItem(editor: TreeViewEditor, node: NodeModel<ItemInfo>) {
+    private fun saveDB(item: NodeModel<ItemInfo>, view: View?, mode: String) {
+
+        val itemID = item.value.getItemID()
+        val itemNum = item.value.getNum()
+        val itemTitle = item.value.getTitle()
+        val itemContent = item.value.getContent()
+        // val itemX = "root 기준 디스턴스로 구하자"
+        // val itemY = "root 기준 디스턴스로 구하자"
+
+        if (itemNum != null) {
+            api.item_save(
+                itemID, userID, itemNum, itemTitle, itemContent, mode
+            ).enqueue(object : Callback<PostModel> {
+                override fun onResponse(call: Call<PostModel>, response: Response<PostModel>) {
+                    Log.d("onResponse", "MindMapActivity item_save: 리스폰 성공")
+                    if(response.body()?.error.toString() == "insert") {
+                        Log.d("onResponse", "MindMapActivity item_save: 삽입 완료")
+                    } else if(response.body()?.error.toString() == "update") {
+                        Log.d("onResponse", "MindMapActivity item_save: 변경 완료")
+                    } else if(response.body()?.error.toString() == "delete") {
+                        Log.d("onResponse", "MindMapActivity item_save: 삭제 완료")
+                    }
+                }
+
+                override fun onFailure(call: Call<PostModel>, t: Throwable) {
+                    Log.d("onFailure", "MindMapActivity item_save: 리스폰 실패 : $t")
+
+                }
+            })
+        }
+    }
+
+    private fun setItem(node: NodeModel<ItemInfo>, editor: TreeViewEditor) {
         val setWindow: View =
             LayoutInflater.from(this@MindMapActivity).inflate(R.layout.window_item_set,null)
         val itemSetWindow = PopupWindow(
@@ -171,6 +336,9 @@ class MindMapActivity : AppCompatActivity() {
         val setButton: Button = setWindow.findViewById(R.id.itemSetButton)
         val setTitle: EditText = setWindow.findViewById(R.id.setTitleView)
         val setContent: EditText = setWindow.findViewById(R.id.setContentView)
+
+        setTitle.setText(node.value.getTitle())
+        setContent.setText(node.value.getContent())
 
         itemSetWindow.isFocusable =true
         itemSetWindow.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
@@ -190,8 +358,12 @@ class MindMapActivity : AppCompatActivity() {
             val content = setContent.text.toString()
 
             if (title != "" && content != "") {
-                val item: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("id", title, content))
-                editor.addChildNodes(node, item)
+                val view = editor.container.getTreeViewHolder(node).view
+                node.value.setTitle(title)
+                node.value.setContent(content)
+                view.findViewById<TextView>(R.id.title).text = title
+                saveDB(node, view, "update")
+                editor.focusMidLocation()
                 itemSetWindow.dismiss()
             } else {
                 Toast.makeText(
@@ -230,173 +402,3 @@ class MindMapActivity : AppCompatActivity() {
         //return new AngledLine();
     }
 }
-/*
-
-    fun doYourOwnJobs(editor: TreeViewEditor, adapter: ItemAdapter) {
-        //drag to move node
-        binding.dragEditModeRd.setOnCheckedChangeListener { v, isChecked ->
-            editor.requestMoveNodeByDragging(isChecked)
-        }
-
-        //focus, means that tree view fill center in your window viewport
-        binding.viewCenterBt.setOnClickListener { v -> editor.focusMidLocation() }
-
-        //add some nodes
-        binding.addNodesBt.setOnClickListener { v ->
-            if (targetNode == null) {
-                Toast.makeText(this, "Ohs, your targetNode is null", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            val a: NodeModel<ItemInfo> =
-                NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_10,
-                    "add-" + atomicInteger.getAndIncrement()))
-            val b: NodeModel<ItemInfo> =
-                NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_11,
-                    "add-" + atomicInteger.getAndIncrement()))
-            val c: NodeModel<ItemInfo> =
-                NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_14,
-                    "add-" + atomicInteger.getAndIncrement()))
-            editor.addChildNodes(targetNode, a, b, c)
-
-
-            //add to remove demo cache
-            removeCache.push(targetNode)
-            targetNode = b
-        }
-
-        //remove node
-        binding.removeNodeBt.setOnClickListener { v ->
-            if (removeCache.isEmpty()) {
-                Toast.makeText(this,
-                    "Ohs, demo removeCache is empty now!! Try to add some nodes firstly!!",
-                    Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            val toRemoveNode: NodeModel<ItemInfo>? = removeCache.pop()
-            targetNode = toRemoveNode!!.getParentNode()
-            editor.removeNode(toRemoveNode)
-        }
-        adapter.setOnItemListener { item, node ->
-            val ItemInfo: ItemInfo = node.getValue()
-            Toast.makeText(this, "you click the head of $ItemInfo", Toast.LENGTH_SHORT).show()
-        }
-
-
-        //treeView control listener
-        val token = Any()
-        val dismissRun = Runnable {
-            binding.scalePercent.setVisibility(View.GONE)
-        }
-        binding.baseTreeView.setTreeViewControlListener(object : TreeViewControlListener {
-            override fun onScaling(state: Int, percent: Int) {
-                Log.e(TAG, "onScaling: $state  $percent")
-                binding.scalePercent.setVisibility(View.VISIBLE)
-                if (state == TreeViewControlListener.MAX_SCALE) {
-                    binding.scalePercent.setText("MAX")
-                } else if (state == TreeViewControlListener.MIN_SCALE) {
-                    binding.scalePercent.setText("MIN")
-                } else {
-                    binding.scalePercent.setText("$percent%")
-                }
-                handler.removeCallbacksAndMessages(token)
-                handler.postAtTime(dismissRun, token, SystemClock.uptimeMillis() + 2000)
-            }
-
-            fun onDragMoveNodesHit(
-                draggingNode: NodeModel<*>,
-                hittingNode: NodeModel<*>,
-                draggingView: View?,
-                hittingView: View?,
-            ) {
-                Log.e(TAG,
-                    "onDragMoveNodesHit: draging[$draggingNode]hittingNode[$hittingNode]")
-            }
-        })
-    }
-
-
-
-    private fun setData(adapter: ItemInfoTreeViewAdapter) {
-        //root
-        val root: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_01, "-root-"))
-
-
-        //child nodes
-        val sub0: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_02, "sub00"))
-        val sub1: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_03, "sub01"))
-        val sub2: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_04, "sub02"))
-        val sub3: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_05, "sub03"))
-        val sub4: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_06, "sub04"))
-        val sub5: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_07, "sub05"))
-        val sub6: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_08, "sub06"))
-        val sub7: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_09, "sub07"))
-        val sub8: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_10, "sub08"))
-        val sub9: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_11, "sub09"))
-        val sub10: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_12, "sub10"))
-        val sub11: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_13, "sub11"))
-        val sub12: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_14, "sub12"))
-        val sub13: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_15, "sub13"))
-        val sub14: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_13, "sub14"))
-        val sub15: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_14, "sub15"))
-        val sub16: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_15, "sub16"))
-        val sub17: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_08, "sub17"))
-        val sub18: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_09, "sub18"))
-        val sub19: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_10, "sub19"))
-        val sub20: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_02, "sub20"))
-        val sub21: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_03, "sub21"))
-        val sub22: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_04, "sub22"))
-        val sub23: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_05, "sub23"))
-        val sub24: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_06, "sub24"))
-        val sub25: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_07, "sub25"))
-        val sub26: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_08, "sub26"))
-        val sub27: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_09, "sub27"))
-        val sub28: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_10, "sub28"))
-        val sub29: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_11, "sub29"))
-        val sub30: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_02, "sub30"))
-        val sub31: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_03, "sub31"))
-        val sub32: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_04, "sub32"))
-        val sub33: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_05, "sub33"))
-        val sub34: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_06, "sub34"))
-        val sub35: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_07, "sub35"))
-        val sub36: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_08, "sub36"))
-        val sub37: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_09, "sub37"))
-        val sub38: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_10, "sub38"))
-        val sub39: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_11, "sub39"))
-        val sub40: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_02, "sub40"))
-        val sub41: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_03, "sub41"))
-        val sub42: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_04, "sub42"))
-        val sub43: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_05, "sub43"))
-        val sub44: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_06, "sub44"))
-        val sub45: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_07, "sub45"))
-        val sub46: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_08, "sub46"))
-        val sub47: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_09, "sub47"))
-        val sub48: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_10, "sub48"))
-        val sub49: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_11, "sub49"))
-        val sub50: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_05, "sub50"))
-        val sub51: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_07, "sub51"))
-        val sub52: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_07, "sub52"))
-        val sub53: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo(R.drawable.ic_07, "sub53"))
-
-        //build relationship
-        treeModel.addNode(root, sub0, sub1, sub3, sub4)
-        treeModel.addNode(sub3, sub12, sub13)
-        treeModel.addNode(sub1, sub2)
-        treeModel.addNode(sub0, sub34, sub5, sub38, sub39)
-        treeModel.addNode(sub4, sub6)
-        treeModel.addNode(sub5, sub7, sub8)
-        treeModel.addNode(sub6, sub9, sub10, sub11)
-        treeModel.addNode(sub11, sub14, sub15)
-        treeModel.addNode(sub10, sub40)
-        treeModel.addNode(sub40, sub16)
-        //treeModel.addNode(sub8,sub17,sub18,sub19,sub20,sub21,sub22,sub23,sub41,sub42,sub43,sub44);
-        treeModel.addNode(sub9, sub47, sub48)
-        //treeModel.addNode(sub16,sub24,sub25,sub26,sub27,sub28,sub29,sub30,sub46,sub45);
-        treeModel.addNode(sub47, sub49)
-        treeModel.addNode(sub12, sub37)
-        treeModel.addNode(sub0, sub36)
-
-        //treeModel.addNode(sub15,sub31,sub32,sub33,sub34,sub35,sub36,sub37);
-        //treeModel.addNode(sub2,sub40,sub41,sub42,sub43,sub44,sub45,sub46);
-        //mark
-
-        //set data*/

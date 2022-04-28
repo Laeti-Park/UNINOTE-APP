@@ -2,6 +2,7 @@ package com.gyso.treeview.touch;
 
 import android.content.Context;
 import android.graphics.PointF;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -54,6 +55,7 @@ public class TouchEventHandler {
                 new GestureDetector.SimpleOnGestureListener() {
                     @Override
                    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                        Log.d("Debug_Log", "onFling/velocityXY: " + velocityX + " and " + velocityY);
                         flingX = new FlingAnimation(mView, DynamicAnimation.TRANSLATION_X);
                         flingX.setStartVelocity(velocityX)
                                .addUpdateListener(flingAnimateListener)
@@ -184,6 +186,7 @@ public class TouchEventHandler {
                 break;
             case MotionEvent.ACTION_OUTSIDE:
                 TreeViewLog.e(TAG, "onTouchEvent: touch out side" );
+                Log.d("Debug", "onTouchEvent: touch out side");
                 break;
         }
         preMovingTouchEvent = MotionEvent.obtain(event);

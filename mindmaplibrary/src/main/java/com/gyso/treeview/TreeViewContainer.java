@@ -233,6 +233,8 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
                 + Arrays.toString(centerM)+"\n"
                 + Arrays.toString(now));
         if(now[Matrix.MSCALE_X]>0&&now[Matrix.MSCALE_Y]>0){
+
+            Log.d("Debug_Log", "TreeViewContainer/focusMidLocation: " + Matrix.MSCALE_X + " and " + Matrix.MSCALE_Y);
             animate().scaleX(centerM[Matrix.MSCALE_X])
                     .translationX(centerM[Matrix.MTRANS_X])
                     .scaleY(centerM[Matrix.MSCALE_Y])
@@ -243,6 +245,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     }
 
     public float getMinScale(){
+        Log.d("Debug_Log", "TreeViewContainer/getMinScale: " + minScale);
         return minScale;
     }
 
@@ -296,6 +299,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
             drawDragBackGround(toHolder.getView());
             if(isDraggingNodeMode && toHolder.getView().getTag(R.id.edit_and_dragging) == IS_EDIT_DRAGGING){
                //Is editing and dragging, so not draw line.
+
                 drawTreeLine(node);
                continue;
             }
@@ -416,10 +420,13 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
                     recordAnchorLocationOnViewPort(false,false,targetHolderNode);
                 }
                 requestLayout();
+                controlListener.onDragMoveNodesEnd(releasedChildHolder.getNode(), targetHolderNode, releasedChildHolder.getView(), targetHolder.getView());
             }else{
                 //recover
                 dragBlock.smoothRecover(releasedChild);
             }
+            Log.d("Debug_Log", "onViewReleased/Drag");
+            requestMoveNodeByDragging(false);
             dragBlock.setDragging(false);
             releasedChild.setElevation(Z_NOR);
             releasedChild.setTag(R.id.edit_and_dragging,null);
@@ -456,7 +463,8 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
                 if(controlListener!=null){
                     Object srcViewHolderTag = srcView.getTag(R.id.item_holder);
                     if(srcViewHolderTag instanceof TreeViewHolder){
-                        controlListener.onDragMoveNodesHit(((TreeViewHolder<?>) srcViewHolderTag).getNode(),null,srcView,null);
+                        controlListener.onDragMoveNodesHit(((TreeViewHolder<?>) srcViewHolderTag).getNode(),
+                                null,srcView,null);
                     }
                 }
             }

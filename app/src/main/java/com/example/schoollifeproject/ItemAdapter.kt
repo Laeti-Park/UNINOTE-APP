@@ -1,6 +1,8 @@
 package com.example.schoollifeproject
 
 import android.graphics.Color
+import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -17,8 +19,10 @@ import com.gyso.treeview.model.NodeModel
 
 class ItemAdapter : TreeViewAdapter<ItemInfo>() {
     private val dashLine = DashLine(Color.parseColor("#F06292"), 6)
+    private var num = 0
     private lateinit var listener: OnItemClickListener
     private lateinit var longClickListener: OnItemLongClickListener
+    private lateinit var doubleClicklistener: OnItemDoubleClickListener
     fun setOnItemListener(listener: (View, NodeModel<ItemInfo>) -> Unit) {
         this.listener = object: OnItemClickListener{
             override fun onItemClick(item: View, node: NodeModel<ItemInfo>) {
@@ -30,6 +34,13 @@ class ItemAdapter : TreeViewAdapter<ItemInfo>() {
         this.longClickListener = object: OnItemLongClickListener{
             override fun onItemLongClick(item: View, node: NodeModel<ItemInfo>) {
                 longClickListener(item, node)
+            }
+        }
+    }
+    fun setOnItemDoubleListener(doubleClickListener: (View, NodeModel<ItemInfo>) -> Unit) {
+        this.doubleClicklistener = object: OnItemDoubleClickListener{
+            override fun onItemDoubleClick(item: View, node: NodeModel<ItemInfo>) {
+                doubleClickListener(item, node)
             }
         }
     }
@@ -47,21 +58,47 @@ class ItemAdapter : TreeViewAdapter<ItemInfo>() {
         //todo get view and node from holder, and then show by you
         val itemView = holder.view
         val node: NodeModel<ItemInfo> = holder.node
+        val nodeID = node.value.getItemID()
         val nodeBack = itemView.findViewById<ConstraintLayout>(R.id.item_back)
         val titleView = itemView.findViewById<TextView>(R.id.title)
         val item: ItemInfo = node.value
+        var i = 0
         titleView.text = item.getTitle()
 
+        Log.d("Debug_Log", "ItemAdapter: ${itemView.x} & ${itemView.y}")
+        if(nodeID == "grade1") {
+            itemView.x = -200f
+            itemView.y = -200f
+        } else if(nodeID == "grade2") {
+            itemView.x = -200f
+            itemView.y = 200f
+        } else if(nodeID == "grade3") {
+            itemView.x = 200f
+            itemView.y = -200f
+        } else if(nodeID == "grade4") {
+            itemView.x = 200f
+            itemView.y = 200f
+        }
+
+        num = num + 100
+
         nodeBack.setOnClickListener { v ->
-            if (listener != null) {
+
+            i++
+            val handler = Handler()
+            val r = Runnable { i = 0 }
+
+            if (i == 1) {
+                handler.postDelayed(r, 250);
                 listener.onItemClick(v, node)
+            } else if(i == 2) {
+                i = 0;
+                doubleClicklistener.onItemDoubleClick(v, node)
             }
         }
 
         nodeBack.setOnLongClickListener { v ->
-            if (longClickListener != null) {
-                longClickListener.onItemLongClick(v, node)
-            }
+            longClickListener.onItemLongClick(v, node)
             true
         }
     }
@@ -86,6 +123,10 @@ class ItemAdapter : TreeViewAdapter<ItemInfo>() {
 
     interface OnItemLongClickListener {
         fun onItemLongClick(item: View, node: NodeModel<ItemInfo>)
+    }
+
+    interface OnItemDoubleClickListener {
+        fun onItemDoubleClick(item: View, node: NodeModel<ItemInfo>)
     }
 }
 

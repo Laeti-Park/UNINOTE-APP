@@ -1,6 +1,20 @@
 package com.example.schoollifeproject
 
-class ItemInfo(private var itemID: String, private var title: String, private var content: String?) {
+import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
+
+class ItemInfo(@Expose
+               @SerializedName("itemID")
+               private var itemID: String,
+               @Expose
+               @SerializedName("itemTitle")
+               private var title: String,
+               @Expose
+               @SerializedName("itemContent")
+               private var content: String?,
+               @Expose
+               @SerializedName("itemNum")
+               private var num: Int?) {
     fun getItemID(): String {
         return itemID
     }
@@ -18,5 +32,8 @@ class ItemInfo(private var itemID: String, private var title: String, private va
     }
     fun setContent(content: String) {
         this.content = content
+    }
+    fun getNum(): Int? {
+        return num
     }
 }

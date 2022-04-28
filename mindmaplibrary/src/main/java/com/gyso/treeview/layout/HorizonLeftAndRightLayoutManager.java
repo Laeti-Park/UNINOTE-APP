@@ -2,6 +2,7 @@ package com.gyso.treeview.layout;
 
 import android.content.Context;
 import android.graphics.Point;
+import android.util.Log;
 import android.view.View;
 
 import com.gyso.treeview.TreeViewContainer;
@@ -83,12 +84,14 @@ public class HorizonLeftAndRightLayoutManager extends RightTreeLayoutManager {
             int rootCy = rootNodeView.getTop()+rootNodeView.getMeasuredHeight()/2;
             //divide equally by two
             LinkedList<? extends NodeModel<?>> rootNodeChildNodes = rootNode.getChildNodes();
+
             Point divideDy = getDivideDy(rootNode, treeViewContainer);
             int centerAy = divideDy.x;
             int centerBy = divideDy.y;
             int divider = rootNodeChildNodes.size()/2;
             int count = 0;
             for (NodeModel<?> node : rootNodeChildNodes) {
+                Log.d("Debug_Log", "HorizonLeftAndRightLayoutManager/performLayout");
                 if(count<divider){
                     //move to mid
                     node.traverseIncludeSelf(n -> moveDy(n,treeViewContainer, (rootCy - centerAy)));
@@ -132,6 +135,7 @@ public class HorizonLeftAndRightLayoutManager extends RightTreeLayoutManager {
     }
 
     private void  moveDy(NodeModel<?> currentNode, TreeViewContainer treeViewContainer, int deltaY){
+        Log.d("Debug_Log", "HorizonLeftAndRightLayoutManager/moveDy");
         TreeViewHolder<?> currentHolder = treeViewContainer.getTreeViewHolder(currentNode);
         View currentNodeView = currentHolder == null ? null : currentHolder.getView();
         if (currentNodeView == null) {
@@ -148,6 +152,7 @@ public class HorizonLeftAndRightLayoutManager extends RightTreeLayoutManager {
     }
 
     private void mirrorByCxDy(NodeModel<?> currentNode, TreeViewContainer treeViewContainer,int centerX, int deltaY){
+        Log.d("Debug_Log", "HorizonLeftAndRightLayoutManager/mirrorByCxDy");
         TreeViewHolder<?> currentHolder = treeViewContainer.getTreeViewHolder(currentNode);
         View currentNodeView = currentHolder == null ? null : currentHolder.getView();
         if (currentNodeView == null) {

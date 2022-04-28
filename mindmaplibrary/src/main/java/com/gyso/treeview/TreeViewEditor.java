@@ -1,5 +1,6 @@
 package com.gyso.treeview;
 
+import android.util.Log;
 import android.view.View;
 
 import com.gyso.treeview.adapter.TreeViewAdapter;
@@ -31,19 +32,20 @@ public class TreeViewEditor {
         this.adapterWeakReference = new WeakReference<>(container.getAdapter());
     }
 
-    private TreeViewContainer getContainer(){
+    public TreeViewContainer getContainer() {
         return containerWeakReference.get();
     }
 
-    private TreeViewAdapter<?> getAdapter(){
+    private TreeViewAdapter<?> getAdapter() {
         return adapterWeakReference.get();
     }
+
     /**
      * let add node in window viewport
      */
-    public void focusMidLocation(){
+    public void focusMidLocation() {
         TreeViewContainer container = getContainer();
-        if (container!=null)container.focusMidLocation();
+        if (container != null) container.focusMidLocation();
     }
 
     public View anchorNodeOnMidViewport(NodeModel<?> targetNode){
@@ -182,6 +184,7 @@ public class TreeViewEditor {
      */
     public void addChildNodes(NodeModel<?> parent, NodeModel<?>... childNodes) {
         TreeViewContainer container = getContainer();
+        Log.d("Debug_Log", "TreeViewEditor/addChildNodes: " + container.getTranslationX() + " and " + container.getTranslationY());
         if(container!=null){
             container.onAddNodes(parent,childNodes);
         }

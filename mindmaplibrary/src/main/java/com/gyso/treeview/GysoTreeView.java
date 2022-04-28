@@ -50,7 +50,7 @@ public class GysoTreeView extends FrameLayout {
         treeViewGestureHandler.setKeepInViewport(false);
 
         //set animate default
-        treeViewContainer.setAnimateAdd(true);
+        treeViewContainer.setAnimateAdd(false);
         treeViewContainer.setAnimateRemove(true);
         treeViewContainer.setAnimateMove(true);
     }

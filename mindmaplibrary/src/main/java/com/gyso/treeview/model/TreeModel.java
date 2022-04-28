@@ -1,11 +1,6 @@
 package com.gyso.treeview.model;
 
-import android.app.ActionBar;
 import android.util.SparseArray;
-import android.util.SparseIntArray;
-
-import com.gyso.treeview.algorithm.table.Table;
-import com.gyso.treeview.util.TreeViewLog;
 
 import java.io.Serializable;
 import java.util.ArrayDeque;
