@@ -4,6 +4,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 
+import com.gyso.treeview.TreeViewContainer;
 import com.gyso.treeview.line.BaseLine;
 import com.gyso.treeview.listener.TreeViewNotifier;
 import com.gyso.treeview.model.NodeModel;
@@ -20,6 +21,8 @@ import com.gyso.treeview.model.TreeModel;
 public abstract class TreeViewAdapter<T> {
     private TreeViewNotifier notifier;
     private TreeModel<T> treeModel;
+    //이거
+    private TreeViewContainer container;
 
     public void setTreeModel(TreeModel<T> treeModel) {
         this.treeModel = treeModel;
@@ -80,4 +83,13 @@ public abstract class TreeViewAdapter<T> {
             notifier.onItemViewChange(node);
         }
     }
+//여기
+    public void setContainer(TreeViewContainer container) {
+        this.container = container;
+    }
+
+    public TreeViewContainer getContainer() {
+        return container;
+    }
+    //까지
 }

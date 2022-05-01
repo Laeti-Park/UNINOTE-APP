@@ -1,5 +1,6 @@
 package com.gyso.treeview;
 
+
 import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
@@ -44,7 +45,6 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-
 /**
  * guaishouN 674149099@qq.com
  */
@@ -66,6 +66,8 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     private int viewHeight;
     private int winWidth;
     private int winHeight;
+    private int saveX;
+    private int saveY;
     private float minScale = 0.2f;
     private Map<NodeModel<?>, TreeViewHolder<?>> nodeViewMap =null;
     private Paint mPaint;
@@ -141,9 +143,12 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         for (int i = 0; i < size; i++) {
             measureChild(getChildAt(i), widthMeasureSpec, heightMeasureSpec);
         }
+
         if(MeasureSpec.getSize(widthMeasureSpec)>0 && MeasureSpec.getSize(heightMeasureSpec)>0){
-            winWidth  = MeasureSpec.getSize(widthMeasureSpec);
-            winHeight = MeasureSpec.getSize(heightMeasureSpec);
+            /*winWidth  = MeasureSpec.getSize(widthMeasureSpec);
+            winHeight = MeasureSpec.getSize(heightMeasureSpec);*/
+            winWidth = saveX;
+            winHeight = saveY;
         }
         if (mTreeLayoutManager != null && mTreeModel != null) {
             mTreeLayoutManager.setViewport(winHeight,winWidth);
@@ -546,6 +551,9 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     public void setAdapter(TreeViewAdapter<?> adapter) {
         this.adapter = adapter;
         this.adapter.setNotifier(this);
+        //이거
+        this.adapter.setContainer(this);
+
     }
 
     public TreeViewHolder<?> getTreeViewHolder(NodeModel<?> nodeModel) {
@@ -708,6 +716,8 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
 
     }
 
+
+
     public void setAnimateRemove(boolean animateRemove) {
         isAnimateRemove = animateRemove;
     }
@@ -731,7 +741,15 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     public boolean isAnimateMove(){
         return isAnimateMove;
     }
-
+//여기
+    public void setX(int x){
+        saveX = x;
+        Log.d("aaa", "aaaaaaaaaaaaaaaaaaaaaaa");
+    }
+    public void setY(int y){
+        saveY = y;
+    }
+//까지
     public void setControlListener(TreeViewControlListener controlListener) {
         this.controlListener = controlListener;
     }

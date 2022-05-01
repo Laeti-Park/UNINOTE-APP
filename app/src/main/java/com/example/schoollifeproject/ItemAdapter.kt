@@ -2,7 +2,6 @@ package com.example.schoollifeproject
 
 import android.graphics.Color
 import android.os.Handler
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -10,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.schoollifeproject.databinding.NodeBaseLayoutBinding
+import com.gyso.treeview.TreeViewContainer
 import com.gyso.treeview.adapter.DrawInfo
 import com.gyso.treeview.adapter.TreeViewAdapter
 import com.gyso.treeview.adapter.TreeViewHolder
@@ -17,9 +17,9 @@ import com.gyso.treeview.line.BaseLine
 import com.gyso.treeview.line.DashLine
 import com.gyso.treeview.model.NodeModel
 
+
 class ItemAdapter : TreeViewAdapter<ItemInfo>() {
     private val dashLine = DashLine(Color.parseColor("#F06292"), 6)
-    private var num = 0
     private lateinit var listener: OnItemClickListener
     private lateinit var longClickListener: OnItemLongClickListener
     private lateinit var doubleClicklistener: OnItemDoubleClickListener
@@ -58,29 +58,20 @@ class ItemAdapter : TreeViewAdapter<ItemInfo>() {
         //todo get view and node from holder, and then show by you
         val itemView = holder.view
         val node: NodeModel<ItemInfo> = holder.node
-        val nodeID = node.value.getItemID()
         val nodeBack = itemView.findViewById<ConstraintLayout>(R.id.item_back)
         val titleView = itemView.findViewById<TextView>(R.id.title)
         val item: ItemInfo = node.value
         var i = 0
         titleView.text = item.getTitle()
 
-        Log.d("Debug_Log", "ItemAdapter: ${itemView.x} & ${itemView.y}")
-        if(nodeID == "grade1") {
-            itemView.x = -200f
-            itemView.y = -200f
-        } else if(nodeID == "grade2") {
-            itemView.x = -200f
-            itemView.y = 200f
-        } else if(nodeID == "grade3") {
-            itemView.x = 200f
-            itemView.y = -200f
-        } else if(nodeID == "grade4") {
-            itemView.x = 200f
-            itemView.y = 200f
-        }
+        //여기
+        var x = itemView.x
+        var y = itemView.y
+        container.setX(x.toInt())
+        container.setY(y.toInt())
+//까지
 
-        num = num + 100
+
 
         nodeBack.setOnClickListener { v ->
 

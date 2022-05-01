@@ -126,8 +126,8 @@ public abstract class TreeLayoutManager {
     }
 
     public void setViewport(int winHeight, int winWidth) {
-        //this.winHeight = winHeight;
-        //this.winWidth = winWidth;
+        this.winHeight = winHeight;
+        this.winWidth = winWidth;
     }
 
     public abstract void  calculateByLayoutAlgorithm(TreeModel<?> mTreeModel);

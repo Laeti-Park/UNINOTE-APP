@@ -28,11 +28,11 @@
             android:layout_height="wrap_content"
             android:hint="내용을 입력해주세요"
             />
+
         <Button
             android:id="@+id/commentBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            />
+            android:layout_gravity="right" />
     </LinearLayout>
 </layout>
