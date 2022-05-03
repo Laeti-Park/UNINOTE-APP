@@ -66,8 +66,6 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     private int viewHeight;
     private int winWidth;
     private int winHeight;
-    private int saveX;
-    private int saveY;
     private float minScale = 0.2f;
     private Map<NodeModel<?>, TreeViewHolder<?>> nodeViewMap =null;
     private Paint mPaint;
@@ -145,11 +143,10 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         }
 
         if(MeasureSpec.getSize(widthMeasureSpec)>0 && MeasureSpec.getSize(heightMeasureSpec)>0){
-            /*winWidth  = MeasureSpec.getSize(widthMeasureSpec);
-            winHeight = MeasureSpec.getSize(heightMeasureSpec);*/
-            winWidth = saveX;
-            winHeight = saveY;
+            winWidth  = MeasureSpec.getSize(widthMeasureSpec);
+            winHeight = MeasureSpec.getSize(heightMeasureSpec);
         }
+        Log.d("Debug_Log", "TreeViewContainer/onMeasure: " + winWidth + " and " + winHeight);
         if (mTreeLayoutManager != null && mTreeModel != null) {
             mTreeLayoutManager.setViewport(winHeight,winWidth);
             mTreeLayoutManager.performMeasure(this);
@@ -226,6 +223,8 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
      */
     public void focusMidLocation() {
         TreeViewLog.e(TAG, "focusMidLocation: "+getMatrix());
+        Log.d("Debug_Log", "TreeViewContainer/focusMidLocation: " + getMatrix());
+
         float[] centerM = new float[9];
         if(centerMatrix==null){
             TreeViewLog.e(TAG, "no centerMatrix!!!");
@@ -239,7 +238,6 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
                 + Arrays.toString(now));
         if(now[Matrix.MSCALE_X]>0&&now[Matrix.MSCALE_Y]>0){
 
-            Log.d("Debug_Log", "TreeViewContainer/focusMidLocation: " + Matrix.MSCALE_X + " and " + Matrix.MSCALE_Y);
             animate().scaleX(centerM[Matrix.MSCALE_X])
                     .translationX(centerM[Matrix.MTRANS_X])
                     .scaleY(centerM[Matrix.MSCALE_Y])
@@ -348,7 +346,8 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         view.setElevation(Z_NOR);
         this.addView(view);
         view.setTag(R.id.item_holder,treeViewHolder);
-        if(nodeViewMap !=null ){
+        Log.d("Debug_Log", "TreeViewContainer/addNodeViewToGroup: " + view.getX() + " and " + view.getY());
+        if(nodeViewMap !=null){
             nodeViewMap.put(node,treeViewHolder);
         }
     }
@@ -551,9 +550,6 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     public void setAdapter(TreeViewAdapter<?> adapter) {
         this.adapter = adapter;
         this.adapter.setNotifier(this);
-        //이거
-        this.adapter.setContainer(this);
-
     }
 
     public TreeViewHolder<?> getTreeViewHolder(NodeModel<?> nodeModel) {
@@ -741,15 +737,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
     public boolean isAnimateMove(){
         return isAnimateMove;
     }
-//여기
-    public void setX(int x){
-        saveX = x;
-        Log.d("aaa", "aaaaaaaaaaaaaaaaaaaaaaa");
-    }
-    public void setY(int y){
-        saveY = y;
-    }
-//까지
+
     public void setControlListener(TreeViewControlListener controlListener) {
         this.controlListener = controlListener;
     }

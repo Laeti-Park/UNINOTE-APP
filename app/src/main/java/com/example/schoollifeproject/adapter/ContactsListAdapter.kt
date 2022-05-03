@@ -1,4 +1,4 @@
-package com.example.schoollifeproject
+package com.example.schoollifeproject.adapter
 
 import android.content.Intent
 import android.view.LayoutInflater
@@ -6,7 +6,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.example.schoollifeproject.model.Contacts
 import com.example.schoollifeproject.databinding.ItemContactsBinding
+import com.example.schoollifeproject.noticeActivity
 
 class ContactsListAdapter(private val itemList: MutableList<Contacts>) :
     RecyclerView.Adapter<ContactsListAdapter.ContactsViewHolder>() {

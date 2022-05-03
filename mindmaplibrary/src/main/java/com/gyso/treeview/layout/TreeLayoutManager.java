@@ -167,10 +167,11 @@ public abstract class TreeLayoutManager {
                                            ViewBox finalLocation,
                                            TreeViewContainer treeViewContainer) {
 
-        Log.d("Debug_Log", "TreeLayoutManager/layoutAnimatePrepare: ");
         Object targetNodeTag = treeViewContainer.getTag(R.id.target_node);
         if (targetNodeTag instanceof NodeModel) {
             currentNodeView.setTag(R.id.node_final_location, finalLocation);
+            Log.d("Debug_Log", "TreeLayoutManager/LayoutAnimatePrepare: " +
+                    finalLocation.top + " and " + finalLocation.left);
             if (targetNodeTag.equals(currentNode)) {
                 TreeViewLog.e(TAG, "Get target location!");
                 treeViewContainer.setTag(R.id.target_node_final_location, finalLocation);
@@ -296,7 +297,12 @@ public abstract class TreeLayoutManager {
                             ViewBox finalLocation = (ViewBox) view.getTag(R.id.node_final_location);
                             if(finalLocation!=null){
                                 view.layout(finalLocation.left, finalLocation.top, finalLocation.right, finalLocation.bottom);
+
+                                Log.d("Debug_Log", "TreeLayoutManager/onAnimationEnd: " +
+                                        finalLocation.left + " and " + finalLocation.top + "\n");
                             }
+                            Log.d("Debug_Log", "TreeLayoutManager/onAnimationEnd/view: " +
+                                    view.getX() + " and " + view.getY());
 
                             view.setTag(R.id.node_pre_location,null);
                             view.setTag(R.id.node_delta_location,null);

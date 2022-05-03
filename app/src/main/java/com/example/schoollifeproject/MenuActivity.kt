@@ -3,7 +3,13 @@ package com.example.schoollifeproject
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import com.example.schoollifeproject.adapter.AnnoListAdapter
 import com.example.schoollifeproject.databinding.ActivityMenuBinding
+import com.example.schoollifeproject.fragment.ListFragment
+import com.example.schoollifeproject.fragment.MindMapFragment
+import com.example.schoollifeproject.model.APIS_login
+import com.example.schoollifeproject.model.AnnoContacts
+import com.example.schoollifeproject.model.PostModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -48,7 +54,7 @@ class MenuActivity : AppCompatActivity() {
                 ) {
 
                     if (!response.body().toString().isEmpty()) {
-                        countKey = response.body()?.countKey!!
+                        //countKey = response.body()?.countKey!!
                     }
                     Log.d("키갯수", countKey.toString())
                 }
@@ -67,25 +73,17 @@ class MenuActivity : AppCompatActivity() {
 
             setOnItemSelectedListener { item ->
                 val transaction = supportFragmentManager.beginTransaction()
-                val frameLayout = supportFragmentManager.findFragmentById(R.id.frameLayout)
-
                 when (item.itemId) {
                     R.id.mainMenu1 -> {
-                        if (frameLayout != null) {
-                            removeFragment()
-                        }
+                        bundle.putInt("countKey", countKey)
+                        listFragment.arguments = bundle
+                        transaction.replace(R.id.frameLayout, listFragment)
+                            .commitAllowingStateLoss()
                         true
                     }
                     R.id.mainMenu2 -> {
                         mindMapFragment.arguments = bundle
                         transaction.replace(R.id.frameLayout, mindMapFragment)
-                            .commitAllowingStateLoss()
-                        true
-                    }
-                    R.id.mainMenu3 -> {
-                        bundle.putInt("countKey", countKey)
-                        listFragment.arguments = bundle
-                        transaction.replace(R.id.frameLayout, listFragment)
                             .commitAllowingStateLoss()
                         true
                     }

@@ -7,8 +7,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.annotation.RequiresApi
-import com.example.schoollifeproject.databinding.ActivityMainBinding
 import com.example.schoollifeproject.databinding.ActivityWriteNoticeBinding
+import com.example.schoollifeproject.fragment.ListFragment
+import com.example.schoollifeproject.model.APIS_login
+import com.example.schoollifeproject.model.PostModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -28,7 +30,7 @@ class WriteNoticeActivity : AppCompatActivity() {
         val editNotice = binding.editNotice
         val addNotice = binding.addNotice
 
-        val intent = Intent(this, ListActivity::class.java)
+        val intent = Intent(this, ListFragment::class.java)
         addNotice.setOnClickListener {
             api.notice_save(
                 editTitle.text.toString(),

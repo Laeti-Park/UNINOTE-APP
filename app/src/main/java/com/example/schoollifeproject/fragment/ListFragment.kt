@@ -1,4 +1,4 @@
-package com.example.schoollifeproject
+package com.example.schoollifeproject.fragment
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,7 +10,11 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.example.schoollifeproject.databinding.ActivityMindMapBinding
+import com.example.schoollifeproject.model.APIS_login
+import com.example.schoollifeproject.model.Contacts
+import com.example.schoollifeproject.model.PostModel
+import com.example.schoollifeproject.WriteNoticeActivity
+import com.example.schoollifeproject.adapter.ContactsListAdapter
 import com.example.schoollifeproject.databinding.FragmentListBinding
 import retrofit2.Call
 import retrofit2.Callback

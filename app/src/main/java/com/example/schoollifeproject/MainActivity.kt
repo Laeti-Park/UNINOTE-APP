@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import com.example.schoollifeproject.databinding.ActivityMainBinding
+import com.example.schoollifeproject.model.APIS_login
+import com.example.schoollifeproject.model.PostModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -22,8 +24,6 @@ class MainActivity : AppCompatActivity() {
         val binding = ActivityMainBinding.inflate(layoutInflater)
         val api_login = APIS_login.create()
         setContentView(binding.root)
-
-
 
         val btnLogin = binding.btnLogin
         val btnRegister = binding.btnRegister
@@ -67,12 +67,8 @@ class MainActivity : AppCompatActivity() {
 
         btnRegister.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
-
             startActivity(intent)
-
         }
-
-
     }
 
     fun failDialog(){

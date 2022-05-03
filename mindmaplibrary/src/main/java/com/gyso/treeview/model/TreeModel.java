@@ -25,11 +25,6 @@ public class TreeModel<T> implements Serializable {
 
     private boolean finishTraversal = false;
 
-    /**
-     * add the node in some father node
-     * @param parent
-     * @param childNodes
-     */
     @SafeVarargs
     public final void addNode(NodeModel<?> parent, NodeModel<?>... childNodes) {
         if(parent!=null&&childNodes!=null && childNodes.length>0){
@@ -47,8 +42,6 @@ public class TreeModel<T> implements Serializable {
                     floorList.add(next);
                 });
             }
-
-
         }
         recordMaxChildrenNode(parent);
     }

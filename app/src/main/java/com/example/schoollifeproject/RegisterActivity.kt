@@ -7,6 +7,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.example.schoollifeproject.databinding.ActivityRegisterBinding
+import com.example.schoollifeproject.model.APIS_login
+import com.example.schoollifeproject.model.PostModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

@@ -1,8 +1,9 @@
-package com.example.schoollifeproject
+package com.example.schoollifeproject.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.schoollifeproject.model.AnnoContacts
 import com.example.schoollifeproject.databinding.AnnoContactsBinding
 
 class AnnoListAdapter(private val itemList: List<AnnoContacts>) :

@@ -3,13 +3,17 @@
     <item
         android:id="@+id/bottomMenu1"
         android:icon="@android:drawable/ic_menu_search"
-        android:title="Child" />
+        android:title="@string/child" />
     <item
         android:id="@+id/bottomMenu2"
         android:icon="@android:drawable/ic_menu_edit"
-        android:title="Edit" />
+        android:title="@string/edit" />
     <item
         android:id="@+id/bottomMenu3"
         android:icon="@android:drawable/ic_menu_delete"
-        android:title="Delete" />
+        android:title="@string/delete" />
+    <item
+        android:id="@+id/bottomMenu4"
+        android:icon="@drawable/ic_menu_file"
+        android:title="@string/file" />
 </menu>

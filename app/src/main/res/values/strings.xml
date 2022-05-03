@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">SchoolLifeProject</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="delete" />
+    <string name="file" />
+    <string name="edit" />
+    <string name="child" />
+    <string name="List" />
+    <string name="MindMap" />
 </resources>
