@@ -39,10 +39,10 @@ class ContactsListAdapter(private val itemList: MutableList<Contacts>) :
             binding.writer.text = item.Writer
             binding.date.text = item.date
             binding.rootView.setOnClickListener {
-                Toast.makeText(itemView.context, "ss", Toast.LENGTH_SHORT).show()
                 val intent = Intent(itemView.context, noticeActivity::class.java)
                 intent.putExtra("key", item.num)
                 intent.putExtra("title", item.Title)
+                intent.putExtra("writer", item.Writer)
                 startActivity(itemView.context, intent, null)
 
             }

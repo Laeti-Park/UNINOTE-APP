@@ -32,7 +32,7 @@ data class PostModel(
     @SerializedName("noticeKey")
     var noticeKey: Int? = null,
     @Expose
-    @SerializedName("noticeContent")
+    @SerializedName("noticeContents")
     var noticeContents: String? = null,
     @Expose
     @SerializedName("itemCount")

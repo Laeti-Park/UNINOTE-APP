@@ -17,7 +17,7 @@ class AnnoListAdapter(private val itemList: List<AnnoContacts>) :
 
         val binding =
             AnnoContactsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return return AnnoViewHolder(binding)
+        return AnnoViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: AnnoViewHolder, position: Int) {

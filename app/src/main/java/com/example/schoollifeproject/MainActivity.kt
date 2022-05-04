@@ -27,6 +27,8 @@ class MainActivity : AppCompatActivity() {
 
         val btnLogin = binding.btnLogin
         val btnRegister = binding.btnRegister
+        val btnNonLogin = binding.btnNonlogin
+
 
         btnLogin.setOnClickListener {
             Log.e("click", "11")
@@ -68,6 +70,14 @@ class MainActivity : AppCompatActivity() {
         btnRegister.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
+        }
+
+        btnNonLogin.setOnClickListener {
+            val intent = Intent(this, MenuActivity::class.java)
+            intent.putExtra("ID", "비회원")
+            intent.putExtra("loginCheck", 1)
+            startActivity(intent)
+
         }
     }
 

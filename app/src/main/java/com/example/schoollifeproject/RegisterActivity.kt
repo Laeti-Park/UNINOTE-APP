@@ -1,6 +1,9 @@
 package com.example.schoollifeproject
 
+import android.annotation.SuppressLint
 import android.content.DialogInterface
+import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -12,20 +15,23 @@ import com.example.schoollifeproject.model.PostModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.DecimalFormat
+import java.util.*
 
 class RegisterActivity : AppCompatActivity() {
     val TAG: String = "Register"
     var isExistBlank = false
     var isPWSame = false
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
         val api_register = APIS_login.create()
+        val df = DecimalFormat("000000")
 
         val btnRegister = binding.btnRegister
+
 
         btnRegister.setOnClickListener {
             Log.d(TAG, "회원가입 버튼 클릭")
@@ -104,4 +110,5 @@ class RegisterActivity : AppCompatActivity() {
         dialog.setPositiveButton("확인", dialog_litener)
         dialog.show()
     }
+
 }

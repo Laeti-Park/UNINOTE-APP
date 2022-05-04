@@ -22,8 +22,6 @@ import retrofit2.Response
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
@@ -33,8 +31,8 @@ private const val ARG_PARAM2 = "param2"
 class ListFragment : Fragment() {
     // TODO: Rename and change types of parameters
 
-
     private var contactsList: MutableList<Contacts> = mutableListOf()
+
     private val adapter = ContactsListAdapter(contactsList)
 
     private lateinit var getResult: ActivityResultLauncher<Intent>
