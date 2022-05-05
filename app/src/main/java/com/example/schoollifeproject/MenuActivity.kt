@@ -4,6 +4,7 @@ import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AlertDialog
 import com.example.schoollifeproject.adapter.AnnoListAdapter
 import com.example.schoollifeproject.adapter.SugListAdapter
@@ -42,14 +43,16 @@ class MenuActivity : AppCompatActivity() {
 
     private var loginCK: Int = 0
 
+    private lateinit var binding: ActivityMenuBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = ActivityMenuBinding.inflate(layoutInflater)
+        binding = ActivityMenuBinding.inflate(layoutInflater)
         setContentView(binding.root)
         val api = APIS_login.create()
 
         binding.annoRecycler.adapter = annoAdapter
-        binding.sugRecycvler.adapter = sugAdapter
+        binding.sugRecycler.adapter = sugAdapter
 
         userID = intent.getStringExtra("ID").toString()
         loginCK = intent.getIntExtra("loginCheck", 0)
@@ -86,17 +89,14 @@ class MenuActivity : AppCompatActivity() {
                         if (frameLayout != null) {
                             removeFragment()
                         }
+                        menuMainVisible(true)
                         true
                     }
                     R.id.mainMenu2 -> {
-                        if (loginCK != 1) {
-                            mindMapFragment.arguments = bundle
-                            transaction.replace(R.id.frameLayout, mindMapFragment)
-                                .commitAllowingStateLoss()
-                        }
-                        else{
-                            failDialog()
-                        }
+                        mindMapFragment.arguments = bundle
+                        transaction.replace(R.id.frameLayout, mindMapFragment)
+                            .commitAllowingStateLoss()
+                        menuMainVisible(false)
                         true
                     }
                     R.id.mainMenu3 -> {
@@ -104,6 +104,7 @@ class MenuActivity : AppCompatActivity() {
                         listFragment.arguments = bundle
                         transaction.replace(R.id.frameLayout, listFragment)
                             .commitAllowingStateLoss()
+                        menuMainVisible(false)
                         true
                     }
                     else -> {
@@ -134,5 +135,19 @@ class MenuActivity : AppCompatActivity() {
 
         dialog.setPositiveButton("확인", dialog_listener)
         dialog.show()
+    }
+
+    fun menuMainVisible(b : Boolean) {
+        if (b) {
+            binding.annoLayout.visibility = View.VISIBLE
+            binding.freeLayout.visibility = View.VISIBLE
+            binding.sugLayout.visibility = View.VISIBLE
+            binding.infoLayout.visibility = View.VISIBLE
+        } else {
+            binding.annoLayout.visibility = View.GONE
+            binding.freeLayout.visibility = View.GONE
+            binding.sugLayout.visibility = View.GONE
+            binding.infoLayout.visibility = View.GONE
+        }
     }
 }

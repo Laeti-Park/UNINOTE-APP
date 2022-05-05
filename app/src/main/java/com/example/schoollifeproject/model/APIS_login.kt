@@ -92,6 +92,19 @@ interface APIS_login {
         @Field("password") password: String
     ): Call<PostModel>
 
+    @FormUrlEncoded
+    @POST(MyApp.map_popular_url)
+    fun map_popular(
+        @Field("userID") userID: String
+    ): Call<PostModel>
+
+    @FormUrlEncoded
+    @POST(MyApp.map_like_url)
+    fun map_like(
+        @Field("userID") userID: String,
+        @Field("mapID") mapID: String
+    ): Call<PostModel>
+
     companion object { // static 처럼 공유객체로 사용가능함. 모든 인스턴스가 공유하는 객체로서 동작함.
         //서버 IP만 입력해주세요~
         private const val BASE_URL = "http://220.118.54.17"

@@ -2,6 +2,7 @@ package com.example.schoollifeproject.adapter
 
 import android.graphics.Color
 import android.os.Handler
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -63,7 +64,6 @@ class ItemAdapter : TreeViewAdapter<ItemInfo>() {
         val item: ItemInfo = node.value
         var i = 0
         contentView.text = item.getContent()
-
 
         nodeBack.setOnClickListener { v ->
             i++

@@ -35,8 +35,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="invisible"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:menu="@menu/map_bottom_menu" />
 
     <ImageButton
@@ -47,7 +48,8 @@
         android:layout_marginBottom="10dp"
         android:src="@drawable/ic_mindmap_focus"
         app:layout_constraintBottom_toBottomOf="@id/bottomNavigationView"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="SpeakableTextPresentCheck,SpeakableTextPresentCheck" />
 
     <ImageButton
         android:id="@+id/publicButton"
@@ -76,7 +78,7 @@
         app:layout_constraintTop_toBottomOf="@id/publicButton">
 
         <ImageView
-            android:id="@+id/viewImage"
+            android:id="@+id/hitImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
@@ -88,19 +90,18 @@
             android:id="@+id/recommedImage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/viewImage"
+            android:layout_below="@id/hitImage"
             android:layout_alignParentStart="true"
             android:layout_marginTop="10sp"
             app:srcCompat="@drawable/ic_mindmap_like" />
 
         <TextView
-            android:id="@+id/mapViews"
+            android:id="@+id/mapHit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="2sp"
             android:layout_marginTop="10sp"
-            android:layout_toRightOf="@id/viewImage"
-            android:text="1000"
+            android:layout_toRightOf="@id/hitImage"
             android:visibility="gone" />
 
         <TextView
@@ -111,7 +112,6 @@
             android:layout_marginLeft="2sp"
             android:layout_marginTop="10sp"
             android:layout_toRightOf="@id/recommedImage"
-            android:text="1000"
             android:visibility="gone" />
 
         <Button

@@ -28,12 +28,8 @@ import com.gyso.treeview.model.TreeModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import android.util.TypedValue
 
-/**
- * A simple [Fragment] subclass.
- * Use the [MindMapFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class MindMapFragment : Fragment() {
     val api = APIS_login.create()
     val adapter = ItemAdapter()
@@ -43,6 +39,7 @@ class MindMapFragment : Fragment() {
     var mapContext: Context? = null
 
     private lateinit var userID : String
+    private lateinit var mapID : String
     private var itemMaxNum = 0
 
     private var mapHit = 0
@@ -60,7 +57,8 @@ class MindMapFragment : Fragment() {
         binding = FragmentMindMapBinding.inflate(inflater, container,false)
         mapContext = context
 
-        userID = arguments?.getString("ID").toString()
+        userID = arguments?.getString("ID").toString() // menuActivity를 통해 받은 userID
+        mapID = arguments?.getString("mapID").toString() // menuActivity를 통해 받은 userID
         Log.d("Debug_Log", "MindMapActivity/userID: ${userID}")
 
         initWidgets()
@@ -73,6 +71,7 @@ class MindMapFragment : Fragment() {
         binding.mapView.adapter = adapter
         binding.mapView.setTreeLayoutManager(treeLayoutManager)
 
+        // 마인드맵 기본 구성
         val root: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("root", "root", null, null))
         val mapView: TreeModel<ItemInfo> = TreeModel(root)
 
@@ -80,20 +79,21 @@ class MindMapFragment : Fragment() {
         val grade2: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("grade2", "2학년", null, null))
         val grade3: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("grade3", "3학년", null, null))
         val grade4: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("grade4", "4학년", null, null))
-
         mapView.addNode(root, grade3, grade4, grade1, grade2)
-
         adapter.treeModel = mapView
 
+        // 마인드맵 추가/제거 관련 객체
         val editor: TreeViewEditor = binding.mapView.editor
 
+        // DB에서 마인드맵 노드 불러오기
         api.item_load(userID).enqueue(object : Callback<List<ItemInfo>> {
             override fun onResponse(call: Call<List<ItemInfo>>, response: Response<List<ItemInfo>>) {
                 val mapItems = HashMap<String, NodeModel<ItemInfo>>()
                 Log.d("onResponse", "MindMapActivity item_load: 리스폰 성공")
                 if(response.body() != null) {
+
                     for(i in response.body()!!) {
-                        val item = NodeModel(i)
+                        val item = NodeModel<ItemInfo>(i)
                         val childID = i.getItemID().split("_")[1]
                         mapItems[childID] = item
                     }
@@ -133,6 +133,7 @@ class MindMapFragment : Fragment() {
             }
         })
 
+        // DB에서 마인드맵 공개여부 확인
         api.map_public(userID).enqueue(object : Callback<PostModel> {
             override fun onResponse(call: Call<PostModel>, response: Response<PostModel>) {
                 Log.d("onResponse", "MindMapActivity map_public: 리스폰 성공 ${response.body()?.error.toString()}")
@@ -154,32 +155,72 @@ class MindMapFragment : Fragment() {
             }
         })
 
+        // DB에서 조회수/추천수 불러오기
+        api.map_popular(userID).enqueue(object : Callback<PostModel> {
+            override fun onResponse(call: Call<PostModel>, response: Response<PostModel>) {
+                Log.d("onResponse", "MindMapActivity map_popular: 리스폰 성공 ${response.body()?.error.toString()}")
+                if (response.body()?.error.toString() == "ok") {
+                    mapHit = response.body()?.mapHit!!+1
+                    mapRecommend = response.body()?.mapRecommend!!
+
+                    binding.mapHit.text = mapHit.toString()
+                    binding.mapRecommend.text = mapRecommend.toString()
+                } else {
+                    mapHit = 0
+                    mapRecommend = 0
+
+                    binding.mapHit.text = mapHit.toString()
+                    binding.mapRecommend.text = mapRecommend.toString()
+                }
+            }
+
+            override fun onFailure(call: Call<PostModel>, t: Throwable) {
+                Log.d("onFailure", "MindMapActivity map_popular: 리스폰 실패 : $t")
+            }
+        })
+
         itemEvent(editor, adapter)
     }
 
+    // DB에서 마인드맵 노드 삽입/삭제/변경
     private fun saveDB(item: NodeModel<ItemInfo>, view: View?, mode: String) {
 
+        // app에서 만든 경우
         val itemID = item.value.getItemID()
-        val itemTop = "asp"
-        val itemLeft = "asp"
+        val itemTop = "New"
+        val itemLeft = "New"
         val itemContent = item.value.getContent()
         val itemCount = item.value.getNum()
-        val itemWidth = "asp"
-        val itemHeight = "asp"
+        var itemWidth = "150px"
+        var itemHeight =  "50px"
         val itemNote = item.value.getNote()
-
+        if (view != null) {
+            view.addOnLayoutChangeListener { _, i, i2, i3, i4, _, _, _, _ ->
+                itemWidth = "${i3-i}px"
+                itemHeight = "${i4-i2}px"
+            }
+        }
         Log.d("onResponse", "MindMapActivity item_save: $mode")
         if (itemCount != null) {
             api.item_save(
-                itemID, itemTop, itemLeft, userID, itemContent, itemCount, itemWidth, itemHeight, itemNote, mode
+                itemID,
+                itemTop,
+                itemLeft,
+                userID,
+                itemContent,
+                itemCount,
+                itemWidth,
+                itemHeight,
+                itemNote,
+                mode
             ).enqueue(object : Callback<PostModel> {
                 override fun onResponse(call: Call<PostModel>, response: Response<PostModel>) {
                     Log.d("onResponse", "MindMapActivity item_save: 리스폰 성공")
-                    if(response.body()?.error.toString() == "insert") {
+                    if (response.body()?.error.toString() == "insert") {
                         Log.d("onResponse", "MindMapActivity item_save: 삽입 완료")
-                    } else if(response.body()?.error.toString() == "update") {
+                    } else if (response.body()?.error.toString() == "update") {
                         Log.d("onResponse", "MindMapActivity item_save: 변경 완료")
-                    } else if(response.body()?.error.toString() == "delete") {
+                    } else if (response.body()?.error.toString() == "delete") {
                         Log.d("onResponse", "MindMapActivity item_save: 삭제 완료")
                     }
                 }
@@ -193,6 +234,7 @@ class MindMapFragment : Fragment() {
     }
 
     private fun itemEvent(editor: TreeViewEditor, adapter: ItemAdapter) {
+
         editor.container.isAnimateAdd = true
 
         adapter.setOnItemListener { view, node ->
@@ -352,22 +394,8 @@ class MindMapFragment : Fragment() {
             editor.focusMidLocation()
         }
 
-        binding.popularLayout.setOnClickListener {
-            val visible: Boolean = binding.mapViews.visibility == View.VISIBLE &&
-                    binding.mapRecommend.visibility == View.VISIBLE
-            Log.d("Debug_Log", "popularLayout: $visible")
-            if (!visible) {
-                binding.mapViews.visibility = View.VISIBLE
-                binding.mapRecommend.visibility = View.VISIBLE
-                binding.recommendButton.visibility = View.VISIBLE
-            } else {
-                binding.mapViews.visibility = View.GONE
-                binding.mapRecommend.visibility = View.GONE
-                binding.recommendButton.visibility = View.GONE
-            }
-        }
-
         binding.publicButton.setOnClickListener {
+            // 공개 버튼 클릭할 경우, 비공개로 전환하거나 공개로 다시 전환할 수 있다.
             val setWindow: View =
                 LayoutInflater.from(mapContext).inflate(R.layout.window_map_public_set, null)
             val publicSetWindow = PopupWindow(
@@ -453,8 +481,39 @@ class MindMapFragment : Fragment() {
             }
         }
 
+        // 조회수, 추천수 띄워서 확인
+        binding.popularLayout.setOnClickListener {
+            val visible: Boolean = binding.mapHit.visibility == View.VISIBLE &&
+                    binding.mapRecommend.visibility == View.VISIBLE
+            Log.d("Debug_Log", "popularLayout: $visible")
+            if (!visible) {
+                binding.mapHit.visibility = View.VISIBLE
+                binding.mapRecommend.visibility = View.VISIBLE
+                binding.recommendButton.visibility = View.VISIBLE
+            } else {
+                binding.mapHit.visibility = View.GONE
+                binding.mapRecommend.visibility = View.GONE
+                binding.recommendButton.visibility = View.GONE
+            }
+        }
+
         binding.recommendButton.setOnClickListener {
-            // 추천수 1 추가
+            api.map_like(userID, mapID).enqueue(object : Callback<PostModel> {
+                override fun onResponse(call: Call<PostModel>, response: Response<PostModel>) {
+                    Log.d("onResponse", "MindMapActivity map_like: 리스폰 성공 ${response.body()?.error.toString()}")
+                    if(response.body()?.error.toString() == "ok") {
+                        mapRecommend = mapRecommend + 1
+                        binding.mapRecommend.text = mapRecommend.toString()
+                    }
+                    if(response.body()?.error.toString() == "failed") {
+
+                    }
+                }
+
+                override fun onFailure(call: Call<PostModel>, t: Throwable) {
+                    Log.d("onFailure", "MindMapActivity map_popular: 리스폰 실패 : $t")
+                }
+            })
         }
     }
 

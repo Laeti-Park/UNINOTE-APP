@@ -197,6 +197,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         values[Matrix.MTRANS_Y]=0f;
         centerMatrix.setValues(values);
         setTouchDelegate();
+        focusMidLocation();
     }
 
     /**
@@ -275,6 +276,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         TreeViewLog.e(TAG,"onSizeChanged w["+w+"]h["+h+"]oldw["+oldw+"]oldh["+oldh+"]");
         viewWidth = w;
         viewHeight = h;
+        Log.d("Debug_Log", "TreeViewContainer/onSizeChange: " + viewWidth + ", " + viewHeight);
         drawInfo.setWindowWidth(w);
         drawInfo.setWindowHeight(h);
         fixWindow();

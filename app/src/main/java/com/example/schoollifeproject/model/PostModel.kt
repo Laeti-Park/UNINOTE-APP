@@ -42,5 +42,11 @@ data class PostModel(
     var public: Int? = null,
     @Expose
     @SerializedName("mapPassword")
-    var mapPassword: String? = null
+    var mapPassword: String? = null,
+    @Expose
+    @SerializedName("hits")
+    var mapHit: Int? = null,
+    @Expose
+    @SerializedName("recommend")
+    var mapRecommend: Int? = null
 )
