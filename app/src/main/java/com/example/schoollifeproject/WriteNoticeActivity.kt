@@ -9,7 +9,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.schoollifeproject.databinding.ActivityWriteNoticeBinding
 import com.example.schoollifeproject.fragment.ListFragment
-import com.example.schoollifeproject.model.APIS_login
+import com.example.schoollifeproject.model.APIS
 import com.example.schoollifeproject.model.PostModel
 import retrofit2.Call
 import retrofit2.Callback
@@ -22,7 +22,7 @@ class WriteNoticeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val binding = ActivityWriteNoticeBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val api = APIS_login.create()
+        val api = APIS.create()
         val date: String = LocalDate.now().toString()
 
 

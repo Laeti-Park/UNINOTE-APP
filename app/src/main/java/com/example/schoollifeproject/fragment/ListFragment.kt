@@ -2,20 +2,14 @@ package com.example.schoollifeproject.fragment
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import com.example.schoollifeproject.model.APIS_login
-import com.example.schoollifeproject.model.Contacts
-import com.example.schoollifeproject.model.PostModel
-import com.example.schoollifeproject.WriteNoticeActivity
 import com.example.schoollifeproject.adapter.ContactsListAdapter
 import com.example.schoollifeproject.databinding.FragmentListBinding
+import com.example.schoollifeproject.model.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -38,54 +32,56 @@ class ListFragment : Fragment() {
     private lateinit var getResult: ActivityResultLauncher<Intent>
     private lateinit var binding: FragmentListBinding
 
-    private val api_notice = APIS_login.create()
+    private val api = APIS.create()
     private var id: String? = null
     private var countKey: Int? = 1
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
         binding = FragmentListBinding.inflate(inflater, container, false)
 
         binding.recyclerView.adapter = adapter
 
         id = arguments?.getString("ID")
-        countKey = arguments?.getInt("countKey", 0)
 
-        Log.d("arguments", id.toString() + ": " + countKey)
 
-        for (i in 1..countKey!!) {
-            Log.d("for", countKey.toString())
-            api_notice.notice_load(
-                i
-            ).enqueue(object : Callback<PostModel> {
-                override fun onResponse(
-                    call: Call<PostModel>,
-                    response: Response<PostModel>
-                ) {
+        api.bbs_load(
+            0
+        ).enqueue(object : Callback<List<Bbs>> {
+            override fun onResponse(call: Call<List<Bbs>>, response: Response<List<Bbs>>) {
+                val list = mutableListOf<Contacts>()
+                for (i in response.body()!!) {
+                    val contacts = (
+                            Contacts(
+                                i.getBbsKey(),
+                                i.getBbsTitle(),
+                                i.getBbsWriter(),
+                                i.getBbsDate(),
+                                i.getBbsContent(),
+                                i.getBbsAvailable()
+                            )
+                            )
+                    list.add(contacts)
 
-                    val contacts =
-                        Contacts(
-                            response.body()?.noticeKey,
-                            response.body()?.noticeTitle.toString(),
-                            response.body()?.noticeName.toString(),
-                            response.body()?.noticeDate.toString()
-                        )
-                    contactsList.add(contacts)
-                    Log.d("onResponse", "성공!=" + i)
-
-                    adapter.notifyDataSetChanged()
                 }
+                contactsList.clear()
+                contactsList.addAll(list)
+                adapter.notifyDataSetChanged()
 
-                override fun onFailure(p0: Call<PostModel>, t: Throwable) {
-                    Log.d("failedLoadNotice", t.message.toString())
-                }
-            })
-        }
+            }
 
-       getResult = registerForActivityResult(
+            override fun onFailure(call: Call<List<Bbs>>, t: Throwable) {
+
+            }
+
+
+        })
+
+
+        /*getResult = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) {
             if (it.resultCode == AppCompatActivity.RESULT_OK) {
@@ -99,7 +95,8 @@ class ListFragment : Fragment() {
                         countKey!! + 1,
                         title,
                         notice,
-                        date
+                        date,
+                        ,
                     )
                 contactsList.add(contacts)
 
@@ -117,8 +114,10 @@ class ListFragment : Fragment() {
             intent.putExtra("ID", id)
             getResult.launch(intent)
             Log.d("addNote", "11")
-        }
+        }*/
+
         return binding.root
     }
+
 
 }

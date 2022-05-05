@@ -1,6 +1,13 @@
 package com.example.schoollifeproject.model
-//Data클래스
-class Contacts(val num: Int?,val Title: String?, val Writer: String?, val date: String?) {
+
+class Contacts(
+    val key: Int,
+    val title: String,
+    val writer: String,
+    val date: String,
+    val content: String,
+    val available: Int
+) {
 
 
 }

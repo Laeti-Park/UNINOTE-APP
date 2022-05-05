@@ -31,18 +31,24 @@ class ContactsListAdapter(private val itemList: MutableList<Contacts>) :
         return itemList.size
     }
 
+
+
     class ContactsViewHolder(private val binding: ItemContactsBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Contacts) {
-            binding.title.text = item.Title
-            binding.writer.text = item.Writer
+            binding.title.text = item.title
+            binding.writer.text = item.writer
             binding.date.text = item.date
             binding.rootView.setOnClickListener {
-                val intent = Intent(itemView.context, noticeActivity::class.java)
-                intent.putExtra("key", item.num)
-                intent.putExtra("title", item.Title)
-                intent.putExtra("writer", item.Writer)
+                val intent = Intent(itemView.context, noticeActivity::class.java).apply {
+                    putExtra("key", item.key)
+                    putExtra("title", item.title)
+                    putExtra("writer", item.writer)
+                    putExtra("date", item.date)
+                    putExtra("content", item.content)
+                    putExtra("available", item.available)
+                }
                 startActivity(itemView.context, intent, null)
 
             }

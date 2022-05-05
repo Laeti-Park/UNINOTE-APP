@@ -10,7 +10,7 @@ import android.view.*
 import android.widget.*
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import com.example.schoollifeproject.model.APIS_login
+import com.example.schoollifeproject.model.APIS
 import com.example.schoollifeproject.model.ItemInfo
 import com.example.schoollifeproject.model.PostModel
 import com.example.schoollifeproject.R
@@ -28,10 +28,9 @@ import com.gyso.treeview.model.TreeModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import android.util.TypedValue
 
 class MindMapFragment : Fragment() {
-    val api = APIS_login.create()
+    val api = APIS.create()
     val adapter = ItemAdapter()
 
     private lateinit var binding: FragmentMindMapBinding

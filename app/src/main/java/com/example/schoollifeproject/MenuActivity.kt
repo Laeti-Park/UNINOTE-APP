@@ -18,11 +18,7 @@ import retrofit2.Response
 
 
 class MenuActivity : AppCompatActivity() {
-    private val annoContactslist: List<AnnoContacts> = listOf(
-        AnnoContacts("공지사항1"),
-        AnnoContacts("공지사항2"),
-        AnnoContacts("공지사항3")
-    )
+    private val annoContactslist: MutableList<AnnoContacts> = mutableListOf()
     private val sugContactslist: List<SugContacts> = listOf(
         SugContacts("1번글", 3),
         SugContacts("2번글", 2),
@@ -38,9 +34,8 @@ class MenuActivity : AppCompatActivity() {
     private val annoAdapter = AnnoListAdapter(annoContactslist)
     private val sugAdapter = SugListAdapter(sugContactslist)
 
-    private var countKey: Int = 0
     private lateinit var userID: String
-
+    private lateinit var userName: String
     private var loginCK: Int = 0
 
     private lateinit var binding: ActivityMenuBinding
@@ -49,29 +44,41 @@ class MenuActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMenuBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val api = APIS_login.create()
-
+        val api = APIS.create()
         binding.annoRecycler.adapter = annoAdapter
         binding.sugRecycler.adapter = sugAdapter
 
         userID = intent.getStringExtra("ID").toString()
+        userName = intent.getStringExtra("name").toString()
         loginCK = intent.getIntExtra("loginCheck", 0)
-        api.notice_key_search(1)
-            .enqueue(object : Callback<PostModel> {
+        Log.d("안녕1", "ㅇ")
+        api.notice_load(1)
+            .enqueue(object : Callback<List<Notice>> {
                 override fun onResponse(
-                    call: Call<PostModel>,
-                    response: Response<PostModel>
+                    call: Call<List<Notice>>,
+                    response: Response<List<Notice>>
                 ) {
-
-                    if (!response.body().toString().isEmpty()) {
-                        countKey = response.body()?.countKey!!
+                    Log.d("안녕2", "ㅇ")
+                    for (i in response.body()!!) {
+                        val contacts = (
+                                AnnoContacts(
+                                    i.getNoticeKey(),
+                                    i.getNoticeTitle(),
+                                    i.getNoticeWriter(),
+                                    i.getNoticeDate(),
+                                    i.getNoticeContent(),
+                                    i.getNoticeAvailable()
+                                )
+                                )
+                        annoContactslist.add(contacts)
+                        annoAdapter.notifyDataSetChanged()
                     }
-                    Log.d("키갯수", countKey.toString())
                 }
 
-                override fun onFailure(p0: Call<PostModel>, t: Throwable) {
-                    Log.d("failedSearchKey", t.message.toString())
+                override fun onFailure(call: Call<List<Notice>>, t: Throwable) {
+                    Log.d("안녕3", t.message.toString())
                 }
+
             })
 
         binding.bottomNavigationView.run {
@@ -100,7 +107,6 @@ class MenuActivity : AppCompatActivity() {
                         true
                     }
                     R.id.mainMenu3 -> {
-                        bundle.putInt("countKey", countKey)
                         listFragment.arguments = bundle
                         transaction.replace(R.id.frameLayout, listFragment)
                             .commitAllowingStateLoss()
@@ -111,6 +117,7 @@ class MenuActivity : AppCompatActivity() {
                         true
                     }
                 }
+
             }
         }
     }
@@ -122,13 +129,13 @@ class MenuActivity : AppCompatActivity() {
         transaction.commit()
     }
 
-    fun failDialog(){
+    fun failDialog() {
         var dialog = AlertDialog.Builder(this)
 
         dialog.setTitle("오류")
         dialog.setMessage("비회원은 이용할 수 없는 기능입니다.")
 
-        val dialog_listener = object: DialogInterface.OnClickListener{
+        val dialog_listener = object : DialogInterface.OnClickListener {
             override fun onClick(dialog: DialogInterface?, which: Int) {
             }
         }
@@ -137,7 +144,7 @@ class MenuActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    fun menuMainVisible(b : Boolean) {
+    fun menuMainVisible(b: Boolean) {
         if (b) {
             binding.annoLayout.visibility = View.VISIBLE
             binding.freeLayout.visibility = View.VISIBLE

@@ -17,14 +17,14 @@ data class PostModel(
     @SerializedName("error")
     var error: String? = null,
     @Expose
-    @SerializedName("countKey")
-    var countKey: Int? = null,
+    @SerializedName("countBbsKey")
+    var countBbsKey: Int? = null,
     @Expose
     @SerializedName("noticeTitle")
     var noticeTitle: String? = null,
     @Expose
     @SerializedName("noticeName")
-    var noticeName: String? =null,
+    var noticeName: String? = null,
     @Expose
     @SerializedName("noticeDate")
     var noticeDate: String? = null,
@@ -48,5 +48,8 @@ data class PostModel(
     var mapHit: Int? = null,
     @Expose
     @SerializedName("recommend")
-    var mapRecommend: Int? = null
+    var mapRecommend: Int? = null,
+    @Expose
+    @SerializedName("countNoticeKey")
+    var countNoticeKey: Int? = null,
 )

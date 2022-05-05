@@ -33,9 +33,12 @@ class NoteReadListAdapter (private val itemList: List<NoteReadContacts>) :
 
         fun bind(item: NoteReadContacts) {
             binding.title.text = item.title
-            /*binding.views.text = item.Views*/
+            binding.date.text = item.date
             binding.writer.text = item.writer
             binding.content.text = item.contents
+            if(item.Available == 1){
+
+            }
         }
     }
 }
