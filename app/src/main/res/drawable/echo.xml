@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@null"/>
-    <!--배경색-->
-    <stroke android:width="2dp" android:color="@color/black" />
-    <!--선-->
-    <padding android:top="@null" android:bottom="@null" android:left="@null" android:right="@null"/>
-    <!--여백-->
-</shape>

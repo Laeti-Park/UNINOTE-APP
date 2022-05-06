@@ -10,7 +10,7 @@
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/teal_200"/>
+        android:background="#F9F9F9"/>
 
     <TextView
         android:id="@+id/scale_percent"
@@ -26,7 +26,7 @@
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="100%"></TextView>
+        tools:text="100%"/>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:background="@android:color/white"
@@ -42,10 +42,11 @@
 
     <ImageButton
         android:id="@+id/focusMidButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="52sp"
+        android:layout_height="52sp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_button"
         android:src="@drawable/ic_mindmap_focus"
         app:layout_constraintBottom_toBottomOf="@id/bottomNavigationView"
         app:layout_constraintEnd_toEndOf="parent"
@@ -53,16 +54,18 @@
 
     <ImageButton
         android:id="@+id/publicButton"
-        android:layout_width="56sp"
-        android:layout_height="wrap_content"
+        android:layout_width="52sp"
+        android:layout_height="52sp"
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/bg_button"
         android:gravity="center"
         android:src="@drawable/ic_mindmap_public"
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="SpeakableTextPresentCheck" />
 
     <RelativeLayout
         android:id="@+id/popularLayout"
@@ -71,7 +74,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="10dp"
         android:animateLayoutChanges="true"
-        android:background="#A1A1A1"
+        android:background="@drawable/bg_button"
         android:gravity="right"
         android:padding="6sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -99,9 +102,11 @@
             android:id="@+id/mapHit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="2sp"
+            android:layout_marginLeft="8sp"
             android:layout_marginTop="10sp"
             android:layout_toRightOf="@id/hitImage"
+            android:textColor="@color/white"
+            android:textSize="14sp"
             android:visibility="gone" />
 
         <TextView
@@ -109,19 +114,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignTop="@id/recommedImage"
-            android:layout_marginLeft="2sp"
+            android:layout_marginLeft="8sp"
             android:layout_marginTop="10sp"
             android:layout_toRightOf="@id/recommedImage"
+            android:textColor="@color/white"
+            android:textSize="14sp"
             android:visibility="gone" />
 
         <Button
             android:id="@+id/recommendButton"
-            android:layout_width="60sp"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/mapRecommend"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="66sp"
+            android:layout_height="40sp"
+            android:layout_below="@id/recommedImage"
             android:layout_marginTop="10sp"
+            android:gravity="right|top"
             android:text="추천"
-            android:textSize="12sp"
+            android:textColor="@color/white"
+            android:textSize="16sp"
             android:visibility="gone" />
 
     </RelativeLayout>

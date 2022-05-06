@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--배경색-->
+    <solid android:color="#CCFFFFFF"/>
+    <!--선-->
+    <stroke android:width="2dp" android:color="@color/black" />
+    <!--여백-->
+    <padding android:top="@null" android:bottom="@null" android:left="@null" android:right="@null"/>
+    <!-- 모서리 둥글게-->
+    <corners android:radius="12dp"/>
+</shape>

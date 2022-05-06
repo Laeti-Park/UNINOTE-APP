@@ -169,9 +169,6 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         }
     }
 
-    /**
-     * fix view tree
-     */
     private void fixWindow() {
         float scale;
         float hr = 1f*viewHeight/winHeight;
@@ -197,6 +194,7 @@ public class TreeViewContainer extends ViewGroup implements TreeViewNotifier {
         values[Matrix.MTRANS_Y]=0f;
         centerMatrix.setValues(values);
         setTouchDelegate();
+        // TODO: 노드 추가하거나 수정할 때 중앙으로 정렬(크기 조절x)
         focusMidLocation();
     }
 

@@ -100,6 +100,7 @@ class MenuActivity : AppCompatActivity() {
                         true
                     }
                     R.id.mainMenu2 -> {
+                        bundle.putString("mapID", userID)
                         mindMapFragment.arguments = bundle
                         transaction.replace(R.id.frameLayout, mindMapFragment)
                             .commitAllowingStateLoss()

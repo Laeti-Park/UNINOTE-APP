@@ -17,5 +17,6 @@ object MyApp {
     const val map_update_url: String = "/map_update.php"
     const val map_popular_url: String = "/map_popular.php"
     const val map_like_url: String = "/map_like.php"
+    const val map_files_url: String = "/map_files.php"
     const val notice_open_url: String = "/notice_open.php"
 }

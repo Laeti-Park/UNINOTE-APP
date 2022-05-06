@@ -3,7 +3,7 @@
     android:id="@+id/item_back"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/white"
+    android:background="@drawable/bg_node"
     android:padding="6dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -12,8 +12,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="2dp"
+        android:fontFamily="@font/title_font1"
         android:text="GysoTreeView"
-        android:textColor="@color/black"
+        android:textColor="#464646"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
