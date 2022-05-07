@@ -1,12 +1,9 @@
 package com.example.schoollifeproject.fragment
 
 import android.app.Activity.RESULT_OK
-import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
@@ -17,14 +14,12 @@ import android.widget.*
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.net.toFile
 import androidx.fragment.app.Fragment
 import com.example.schoollifeproject.R
 import com.example.schoollifeproject.adapter.ItemAdapter
 import com.example.schoollifeproject.databinding.FragmentMindMapBinding
 import com.example.schoollifeproject.model.APIS
 import com.example.schoollifeproject.model.ItemInfo
-import com.example.schoollifeproject.model.PostModel
 import com.gyso.treeview.TreeViewEditor
 import com.gyso.treeview.layout.CompactHorizonLeftAndRightLayoutManager
 import com.gyso.treeview.layout.TreeLayoutManager
@@ -33,26 +28,20 @@ import com.gyso.treeview.line.StraightLine
 import com.gyso.treeview.listener.TreeViewControlListener
 import com.gyso.treeview.model.NodeModel
 import com.gyso.treeview.model.TreeModel
-import okhttp3.MediaType
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import android.net.Uri
-import android.webkit.MimeTypeMap
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
-import java.io.FileOutputStream
 import android.provider.MediaStore
 
 import android.provider.DocumentsContract
-
-
-
+import com.example.schoollifeproject.model.PostModel
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 
 
 class MindMapFragment : Fragment() {
@@ -328,23 +317,6 @@ class MindMapFragment : Fragment() {
             })
         }
     }
-        //파일 생성
-        //img_url은 이미지의 경로
-        //파일 생성
-        //img_url은 이미지의 경로
-        /*
-        val file: File = File(img_url)
-        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
-        val body = MultipartBody.Part.createFormData("uploaded_file", file.name, requestFile)
-        val resultCall: Call<PostModel> = APIS_login.upload_image(body)
-        resultCall.enqueue(object : Callback<PostModel> {
-            override fun onResponse(call: Call<PostModel>, response: Response<PostModel>) {
-
-            }
-            override fun onFailure(call: Call<PostModel>, t: Throwable) {
-
-            }
-        })*/
 
     private fun itemEvent(editor: TreeViewEditor, adapter: ItemAdapter) {
         lateinit var formId: MultipartBody.Part
@@ -365,16 +337,18 @@ class MindMapFragment : Fragment() {
                     val imagePath = getRealPathFromURI(uri!!)
                     val file = File(imagePath)
                     formFile = FormDataUtil.getImageBody("media", file)
+                    Log.d("$TAG", "resultLauncher: ${imagePath}")
+                    Log.d("$TAG", "resultLauncher: ${formFile}")
 
-                        api.map_files(formFile).enqueue(object : Callback<String?> {
+                        api.map_files(formFile).enqueue(object : Callback<PostModel> {
                             override fun onResponse(
-                                call: Call<String?>,
-                                response: Response<String?>
+                                call: Call<PostModel>,
+                                response: Response<PostModel>
                             ) {
                                 Log.e("uploadChat()", "성공 : ${response.body()}")
                             }
 
-                            override fun onFailure(call: Call<String?>, t: Throwable) {
+                            override fun onFailure(call: Call<PostModel>, t: Throwable) {
                                 Log.e("uploadChat()", "에러 : " + t.message)
                             }
                         })
@@ -822,10 +796,11 @@ object FormDataUtil {
     }
 
     fun getImageBody(key: String, file: File): MultipartBody.Part {
+        Log.d("ah", "map_public: 리스폰 실패 : ${key}, ${file.name} ${file.asRequestBody("image/*".toMediaType())}")
         return MultipartBody.Part.createFormData(
             key,
             filename = file.name,
-            body = file.asRequestBody("image/*".toMediaType())
+            body = file.asRequestBody("image/*".toMediaTypeOrNull())
         )
     }
 

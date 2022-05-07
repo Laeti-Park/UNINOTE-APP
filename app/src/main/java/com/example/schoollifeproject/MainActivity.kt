@@ -17,6 +17,9 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+/**
+ * 어플 실행 로그인 Activity
+ * */
 
 class MainActivity : AppCompatActivity() {
 
@@ -25,6 +28,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        /**
+         * 파일관리자 접근 권한 설정
+         * */
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(
                     applicationContext,
@@ -50,45 +56,52 @@ class MainActivity : AppCompatActivity() {
         val btnRegister = binding.btnRegister
         val btnNonLogin = binding.btnNonlogin
 
-
+        /**
+         * 메인화면 로그인버튼 클릭리스너
+         * */
         btnLogin.setOnClickListener {
-            Log.e("click", "11")
             val id = binding.editId.text.toString()
             val pw = binding.editPw.text.toString()
-
             val intent = Intent(this, MenuActivity::class.java)
 
-
+            /**
+             * 레트로핏 서버 접근 id value를 이용해 DB에서 pw호출
+             * id, pw를 비교 일치하는지 확인
+             * */
             api.login_users(
                 id
             ).enqueue(object : Callback<PostModel> {
-
+                //접근성공
                 override fun onResponse(
                     call: Call<PostModel>,
                     response: Response<PostModel>
                 ) {
-                    Log.d("dbTestNoBody", response.toString())
-                    Log.d("dbTestBody", response.body().toString())
                     if (!response.body().toString().isEmpty()) {
-                        if (response.body()?.error.toString() == "error") {
-                            failDialog("isLogin")
-                        } else if (pw == response.body()?.userPassword.toString()) {
-                            intent.putExtra("ID", response.body()?.userID.toString())
-                            intent.putExtra("name", response.body()?.userName.toString())
-                            startActivity(intent)
-                        } else {
-                            failDialog("fail")
+                        //해당 아이디가 로그인상태인지 체크 후 로그인
+                        when {
+                            response.body()?.error.toString() == "error" -> failDialog("isLogin")
+                            pw == response.body()?.userPassword.toString() -> {
+                                intent.putExtra("ID", response.body()?.userID.toString())
+                                intent.putExtra("name", response.body()?.userName.toString())
+                                startActivity(intent)
+                            }
+                            else -> {
+                                failDialog("fail")
+                            }
                         }
                     }
                 }
 
                 override fun onFailure(p0: Call<PostModel>, t: Throwable) {
-                    Log.d("failedDBopen", t.message.toString())
                     failDialog("fail")
                 }
+
             })
         }
 
+        /**
+         * 회원가입, 비회원로그인 버튼 클릭리스너
+         * */
         btnRegister.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
@@ -103,21 +116,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * 로그인 실패 Dialog
+     * */
+
     fun failDialog(error: String) {
         var dialog = AlertDialog.Builder(this)
 
         dialog.setTitle("로그인실패")
-        if (error == "isLogin") {
+        if (error == "isLogin")
             dialog.setMessage("다른 브라우저에서 로그아웃해주세요")
-        } else {
+        else if (error == "fail")
+            dialog.setMessage("인터넷 연결을 확인해주세요")
+        else
             dialog.setMessage("아이디와 비밀번호를 확인해주세요")
-        }
-        val dialog_listener = object : DialogInterface.OnClickListener {
-            override fun onClick(dialog: DialogInterface?, which: Int) {
-                when (which) {
-                    DialogInterface.BUTTON_POSITIVE ->
-                        Log.d(TAG, "확인 버튼 클릭")
-                }
+
+        val dialog_listener = DialogInterface.OnClickListener { dialog, which ->
+            when (which) {
+                DialogInterface.BUTTON_POSITIVE ->
+                    Log.d(TAG, "확인 버튼 클릭")
             }
         }
 

@@ -3,17 +3,25 @@ package com.example.schoollifeproject
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.core.view.isGone
 import com.example.schoollifeproject.adapter.NoteReadListAdapter
 import com.example.schoollifeproject.databinding.ActivityNoticeBinding
 import com.example.schoollifeproject.model.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
+/**
+ * 게시물 선택 실행 Activity
+ * */
 
 class noticeActivity : AppCompatActivity() {
     private var readList: MutableList<NoteReadContacts> = mutableListOf()
-
-    //private var commentContactsList: MutableList<NoteCommentContacts> = mutableListOf()
     private val readAdapter = NoteReadListAdapter(readList)
-    //private val commentAdapter = NoteCommentListAdapter(commentContactsList)
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,33 +29,24 @@ class noticeActivity : AppCompatActivity() {
         val binding = ActivityNoticeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        /*val current = LocalDateTime.now()
-        val formatter = DateTimeFormatter.ofPattern("HH시 mm분")
-        val formatted = current.format(formatter)
-*/
-        val api = APIS.create()
         binding.noteReadRecyclerView.adapter = readAdapter
-        //binding.commentRecyclerView.adapter = commentAdapter
 
-
-        val key = intent.getIntExtra("key", 0)
         val title = intent.getStringExtra("title").toString()
         val writer = intent.getStringExtra("writer").toString()
         val date = intent.getStringExtra("date").toString()
         val content = intent.getStringExtra("content").toString()
-        val available = intent.getIntExtra("available", 0)
 
         val contact = (
                 NoteReadContacts(
                     title,
                     writer,
                     date,
-                    content,
-                    available
+                    content
                 )
                 )
         readList.add(contact)
         readAdapter.notifyDataSetChanged()
+
 
         //val views = 100
         //해당 글의 키를 가져와 표시

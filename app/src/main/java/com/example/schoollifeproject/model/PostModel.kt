@@ -2,7 +2,9 @@ package com.example.schoollifeproject.model
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-
+/**
+ * 서버에서 return된 값이 저장되는 DATA 클래스
+ * */
 data class PostModel(
     @Expose
     @SerializedName("userID")
@@ -52,4 +54,7 @@ data class PostModel(
     @Expose
     @SerializedName("countNoticeKey")
     var countNoticeKey: Int? = null,
+    @Expose
+    @SerializedName("key")
+    var key: Int? = null,
 )

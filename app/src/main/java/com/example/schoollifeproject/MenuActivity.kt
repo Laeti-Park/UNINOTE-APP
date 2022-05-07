@@ -3,7 +3,6 @@ package com.example.schoollifeproject
 import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import com.example.schoollifeproject.adapter.AnnoListAdapter
@@ -11,11 +10,15 @@ import com.example.schoollifeproject.adapter.SugListAdapter
 import com.example.schoollifeproject.databinding.ActivityMenuBinding
 import com.example.schoollifeproject.fragment.ListFragment
 import com.example.schoollifeproject.fragment.MindMapFragment
+import com.example.schoollifeproject.fragment.MapListFragment
 import com.example.schoollifeproject.model.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+/**
+ * 로그인 후 메뉴 Activity
+ * */
 
 class MenuActivity : AppCompatActivity() {
     private val annoContactslist: MutableList<AnnoContacts> = mutableListOf()
@@ -26,7 +29,6 @@ class MenuActivity : AppCompatActivity() {
     )
 
     /*
-        private var annoContactsList: MutableList<AnnoContacts> = mutableListOf()
         private var contactsList: MutableList<Contacts> = mutableListOf()
         private var contactsList: MutableList<Contacts> = mutableListOf()
         private var contactsList: MutableList<Contacts> = mutableListOf()
@@ -44,48 +46,57 @@ class MenuActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMenuBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         val api = APIS.create()
+
         binding.annoRecycler.adapter = annoAdapter
         binding.sugRecycler.adapter = sugAdapter
 
         userID = intent.getStringExtra("ID").toString()
         userName = intent.getStringExtra("name").toString()
         loginCK = intent.getIntExtra("loginCheck", 0)
-        Log.d("안녕1", "ㅇ")
-        api.notice_load(1)
-            .enqueue(object : Callback<List<Notice>> {
-                override fun onResponse(
-                    call: Call<List<Notice>>,
-                    response: Response<List<Notice>>
-                ) {
-                    Log.d("안녕2", "ㅇ")
-                    for (i in response.body()!!) {
-                        val contacts = (
-                                AnnoContacts(
-                                    i.getNoticeKey(),
-                                    i.getNoticeTitle(),
-                                    i.getNoticeWriter(),
-                                    i.getNoticeDate(),
-                                    i.getNoticeContent(),
-                                    i.getNoticeAvailable()
-                                )
-                                )
-                        annoContactslist.add(contacts)
-                        annoAdapter.notifyDataSetChanged()
-                    }
+        /**
+         * 메인메뉴의 공지사항 DB 불러오기
+         * */
+        api.notice_load(
+            1       //type 0 = 일반 포스팅, type 1 = 공지 포스팅
+        ).enqueue(object : Callback<List<Notice>> {
+            override fun onResponse(
+                call: Call<List<Notice>>,
+                response: Response<List<Notice>>
+            ) {
+                //공지사항의 개수만큼 호출, 연결
+                for (i in response.body()!!) {
+                    val contacts = (
+                            AnnoContacts(
+                                i.getNoticeKey(),
+                                i.getNoticeTitle(),
+                                i.getNoticeWriter(),
+                                i.getNoticeDate(),
+                                i.getNoticeContent()
+                            )
+                            )
+                    annoContactslist.add(contacts)
+                    annoAdapter.notifyDataSetChanged()
                 }
+            }
 
-                override fun onFailure(call: Call<List<Notice>>, t: Throwable) {
-                    Log.d("안녕3", t.message.toString())
-                }
+            override fun onFailure(call: Call<List<Notice>>, t: Throwable) {}
 
-            })
-
+        })
+        /**
+         * 프래그먼트 하단바
+         * 메뉴1 - 메인화면
+         * 메뉴2 - 로드맵제작(비회원 이용불가)
+         * 메뉴3 - 게시판
+         * 메뉴4 - 로드맵게시판
+         * */
         binding.bottomNavigationView.run {
-
             val listFragment = ListFragment()
             val mindMapFragment = MindMapFragment()
+            val settingFragment = MapListFragment()
             var bundle = Bundle()
+
             bundle.putString("ID", userID)
 
             setOnItemSelectedListener { item ->
@@ -100,11 +111,15 @@ class MenuActivity : AppCompatActivity() {
                         true
                     }
                     R.id.mainMenu2 -> {
-                        bundle.putString("mapID", userID)
-                        mindMapFragment.arguments = bundle
-                        transaction.replace(R.id.frameLayout, mindMapFragment)
-                            .commitAllowingStateLoss()
-                        menuMainVisible(false)
+                        if (userID == "비회원")
+                            failDialog()
+                        else {
+                            bundle.putString("mapID", userID)
+                            mindMapFragment.arguments = bundle
+                            transaction.replace(R.id.frameLayout, mindMapFragment)
+                                .commitAllowingStateLoss()
+                            menuMainVisible(false)
+                        }
                         true
                     }
                     R.id.mainMenu3 -> {
@@ -115,6 +130,10 @@ class MenuActivity : AppCompatActivity() {
                         true
                     }
                     else -> {
+                        listFragment.arguments = bundle
+                        transaction.replace(R.id.frameLayout, settingFragment)
+                            .commitAllowingStateLoss()
+                        menuMainVisible(false)
                         true
                     }
                 }
@@ -130,22 +149,16 @@ class MenuActivity : AppCompatActivity() {
         transaction.commit()
     }
 
-    fun failDialog() {
+    private fun failDialog() {
         var dialog = AlertDialog.Builder(this)
-
         dialog.setTitle("오류")
         dialog.setMessage("비회원은 이용할 수 없는 기능입니다.")
-
-        val dialog_listener = object : DialogInterface.OnClickListener {
-            override fun onClick(dialog: DialogInterface?, which: Int) {
-            }
-        }
-
+        val dialog_listener = DialogInterface.OnClickListener { dialog, which -> }
         dialog.setPositiveButton("확인", dialog_listener)
         dialog.show()
     }
 
-    fun menuMainVisible(b: Boolean) {
+    private fun menuMainVisible(b: Boolean) {
         if (b) {
             binding.annoLayout.visibility = View.VISIBLE
             binding.freeLayout.visibility = View.VISIBLE

@@ -3,6 +3,9 @@ package com.example.schoollifeproject.model
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
+/**
+ * 게시글을 JSON파일 타입으로 호출하기위한 Class
+ * */
 class Bbs(
     @Expose
     @SerializedName("bbsID")
@@ -23,10 +26,7 @@ class Bbs(
     @SerializedName("bbsContent")
     private var bbsContent: String,
 
-    @Expose
-    @SerializedName("bbsAvailable")
-    private var bbsAvailable: Int,
-) {
+    ) {
 
     fun getBbsKey(): Int {
         return bbsID
@@ -46,10 +46,6 @@ class Bbs(
 
     fun getBbsContent(): String {
         return bbsContent
-    }
-
-    fun getBbsAvailable(): Int {
-        return bbsAvailable
     }
 
 }

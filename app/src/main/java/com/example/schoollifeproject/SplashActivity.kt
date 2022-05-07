@@ -6,6 +6,10 @@ import android.os.Bundle
 import android.os.Handler
 import com.example.schoollifeproject.databinding.ActivitySplashBinding
 
+/**
+ * 처음 실행시 등장하는 Activity
+ * */
+
 class SplashActivity : AppCompatActivity() {
 
     val SPLASH_VIEW_TIME : Long = 2000

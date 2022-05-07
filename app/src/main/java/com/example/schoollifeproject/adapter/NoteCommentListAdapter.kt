@@ -7,7 +7,9 @@ import com.example.schoollifeproject.databinding.NoticeCommentContactsBinding
 import com.example.schoollifeproject.databinding.NoticeReadContactsBinding
 import com.example.schoollifeproject.model.NoteCommentContacts
 import com.example.schoollifeproject.model.NoteReadContacts
-
+/**
+ * 댓글작성 RecyclerView Adapter (미사용)
+ * */
 class NoteCommentListAdapter(private var itemList: List<NoteCommentContacts>) :
     RecyclerView.Adapter<NoteCommentListAdapter.NoteCommentViewHolder>() {
 
@@ -30,7 +32,6 @@ class NoteCommentListAdapter(private var itemList: List<NoteCommentContacts>) :
 
     class NoteCommentViewHolder(private val binding: NoticeCommentContactsBinding) :
         RecyclerView.ViewHolder(binding.root) {
-
         fun bind(item: NoteCommentContacts) {
             binding.commentTv.text = item.comment
             binding.commentWriter.text = item.writer
