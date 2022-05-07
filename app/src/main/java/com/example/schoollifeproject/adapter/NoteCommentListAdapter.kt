@@ -3,10 +3,8 @@ package com.example.schoollifeproject.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.schoollifeproject.databinding.NoticeCommentContactsBinding
-import com.example.schoollifeproject.databinding.NoticeReadContactsBinding
+import com.example.schoollifeproject.databinding.ContactsNoticeCommentBinding
 import com.example.schoollifeproject.model.NoteCommentContacts
-import com.example.schoollifeproject.model.NoteReadContacts
 /**
  * 댓글작성 RecyclerView Adapter (미사용)
  * */
@@ -15,7 +13,7 @@ class NoteCommentListAdapter(private var itemList: List<NoteCommentContacts>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteCommentViewHolder {
         val binding =
-            NoticeCommentContactsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ContactsNoticeCommentBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return NoteCommentViewHolder(binding)
     }
 
@@ -30,7 +28,7 @@ class NoteCommentListAdapter(private var itemList: List<NoteCommentContacts>) :
         return itemList.size
     }
 
-    class NoteCommentViewHolder(private val binding: NoticeCommentContactsBinding) :
+    class NoteCommentViewHolder(private val binding: ContactsNoticeCommentBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: NoteCommentContacts) {
             binding.commentTv.text = item.comment

@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.schoollifeproject.model.AnnoContacts
-import com.example.schoollifeproject.databinding.AnnoContactsBinding
+import com.example.schoollifeproject.databinding.ContactsAnnoBinding
 import com.example.schoollifeproject.noticeActivity
 
 /**
@@ -21,7 +21,7 @@ class AnnoListAdapter(private val itemList: List<AnnoContacts>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AnnoViewHolder {
         val binding =
-            AnnoContactsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ContactsAnnoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return AnnoViewHolder(binding)
     }
 
@@ -32,7 +32,7 @@ class AnnoListAdapter(private val itemList: List<AnnoContacts>) :
         }
     }
 
-    class AnnoViewHolder(private val binding: AnnoContactsBinding) :
+    class AnnoViewHolder(private val binding: ContactsAnnoBinding) :
         RecyclerView.ViewHolder(binding.root) {
         //메인 메뉴 공지사항에 등록될 text, listener
         fun bind(item: AnnoContacts) {

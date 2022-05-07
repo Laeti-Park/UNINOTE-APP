@@ -30,7 +30,6 @@ import retrofit2.Response
  */
 class ListFragment : Fragment() {
     private var contactsList: MutableList<Contacts> = mutableListOf()
-
     private val adapter = ContactsListAdapter(contactsList)
 
     private lateinit var getResult: ActivityResultLauncher<Intent>

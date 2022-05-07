@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.schoollifeproject.R
-import com.example.schoollifeproject.databinding.NodeBaseLayoutBinding
+import com.example.schoollifeproject.databinding.ContactsMapNodeBinding
 import com.example.schoollifeproject.model.ItemInfo
 import com.gyso.treeview.adapter.DrawInfo
 import com.gyso.treeview.adapter.TreeViewAdapter
@@ -52,8 +52,8 @@ class ItemAdapter : TreeViewAdapter<ItemInfo>() {
         viewGroup: ViewGroup,
         node: NodeModel<ItemInfo>,
     ): TreeViewHolder<ItemInfo> {
-        val nodeBinding: NodeBaseLayoutBinding =
-            NodeBaseLayoutBinding.inflate(LayoutInflater.from(viewGroup.context), viewGroup, false)
+        val nodeBinding: ContactsMapNodeBinding =
+            ContactsMapNodeBinding.inflate(LayoutInflater.from(viewGroup.context), viewGroup, false)
         return TreeViewHolder(nodeBinding.root, node)
     }
 

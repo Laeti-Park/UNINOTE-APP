@@ -20,6 +20,8 @@ object MyApp {
     const val map_update_url: String = "/map_update.php"
     const val map_popular_url: String = "/map_popular.php"
     const val map_like_url: String = "/map_like.php"
-    const val map_files_url: String = "/map_files.php"
+    const val item_file_save_url: String = "/item_file_save.php"
+    const val item_file_load_url: String = "/item_file_load.php"
+    const val item_file_del_url: String = "/item_file_del.php"
     const val map_list_url: String = "/map_list.php"
 }

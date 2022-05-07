@@ -22,11 +22,7 @@ import retrofit2.Response
 
 class MenuActivity : AppCompatActivity() {
     private val annoContactslist: MutableList<AnnoContacts> = mutableListOf()
-    private val sugContactslist: List<SugContacts> = listOf(
-        SugContacts("1번글", 3),
-        SugContacts("2번글", 2),
-        SugContacts("3번글", 1)
-    )
+    private val sugContactslist: MutableList<MapContacts> = mutableListOf()
 
     /*
         private var contactsList: MutableList<Contacts> = mutableListOf()
@@ -82,6 +78,26 @@ class MenuActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<List<Notice>>, t: Throwable) {}
+
+        })
+
+
+
+        api.map_list(1).enqueue(object : Callback<List<MapModel>> {
+            override fun onResponse(call: Call<List<MapModel>>, response: Response<List<MapModel>>) {
+                for (i in response.body()!!) {
+                    val contacts = (
+                            MapContacts(
+                                i.getMapID()
+                            )
+                            )
+                    sugContactslist.add(contacts)
+                    sugAdapter.notifyDataSetChanged()
+                }
+            }
+
+            override fun onFailure(call: Call<List<MapModel>>, t: Throwable) {
+            }
 
         })
         /**

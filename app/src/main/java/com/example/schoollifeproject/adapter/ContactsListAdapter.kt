@@ -1,14 +1,12 @@
 package com.example.schoollifeproject.adapter
 
 import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.schoollifeproject.model.Contacts
-import com.example.schoollifeproject.databinding.ItemContactsBinding
+import com.example.schoollifeproject.databinding.ContactsListItemBinding
 import com.example.schoollifeproject.noticeActivity
 
 /**
@@ -19,7 +17,7 @@ class ContactsListAdapter(private val itemList: MutableList<Contacts>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactsViewHolder {
         val binding =
-            ItemContactsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ContactsListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ContactsViewHolder(binding)
     }
 
@@ -35,7 +33,7 @@ class ContactsListAdapter(private val itemList: MutableList<Contacts>) :
     }
 
 
-    class ContactsViewHolder(private val binding: ItemContactsBinding) :
+    class ContactsViewHolder(private val binding: ContactsListItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         //게시판에 등록될 text, listener
         fun bind(item: Contacts) {

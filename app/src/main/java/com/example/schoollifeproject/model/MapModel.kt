@@ -6,9 +6,9 @@ import com.google.gson.annotations.SerializedName
 class MapModel (
     @Expose
     @SerializedName("userID")
-    private var userID: String
+    private var mapID: String
 ){
-    fun getUserID(): String{
-        return userID
+    fun getMapID(): String{
+        return mapID
     }
 }
