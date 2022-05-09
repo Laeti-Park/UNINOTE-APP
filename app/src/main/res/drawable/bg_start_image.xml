@@ -3,7 +3,8 @@
     <item android:drawable="@color/white" />
     <item>
         <bitmap
-            android:gravity="center"
-            android:src="@drawable/icon_temp" />
+            android:layout_height="wrap_content"
+            android:gravity="fill"
+            android:src="@drawable/uni_back" />
     </item>
 </layer-list>

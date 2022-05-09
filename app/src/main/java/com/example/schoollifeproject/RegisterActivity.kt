@@ -14,7 +14,8 @@ import retrofit2.Response
 
 /**
  * 회원가입 실행 Activity
- * */
+ * 작성자 : 이준영
+ */
 
 class RegisterActivity : AppCompatActivity() {
     var isExistBlank = false

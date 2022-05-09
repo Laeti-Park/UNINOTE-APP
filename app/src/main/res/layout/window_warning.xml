@@ -8,13 +8,14 @@
 
     <TextView
         android:id="@+id/warningText"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="6dp"
+        android:fontFamily="@font/title_font2"
         android:gravity="center"
-        android:text="노드를 삭제하시겠습니까?"
+        android:text="⚠ 노드를 삭제하시겠습니까? ⚠"
         android:textColor="#FF1E1E1E"
-        android:textSize="14sp"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -27,8 +28,12 @@
         android:layout_marginLeft="10dp"
         android:layout_marginTop="20dp"
         android:layout_marginRight="10dp"
+        android:fontFamily="@font/title_font1"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
         android:text="확인"
         android:textColor="#FF1E1E1E"
+        android:textSize="16sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@id/cancelButton"
         app:layout_constraintTop_toBottomOf="@id/warningText" />
@@ -40,9 +45,13 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginRight="10dp"
+        android:fontFamily="@font/title_font1"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
         android:text="취소"
         android:textColor="#FF1E1E1E"
-        app:layout_constraintLeft_toRightOf="@id/pwButton"
+        android:textSize="16sp"
+        app:layout_constraintLeft_toRightOf="@id/checkButton"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/warningText" />
 

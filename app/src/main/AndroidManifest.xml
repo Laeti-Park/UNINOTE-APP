@@ -14,10 +14,10 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SchoolLifeProject"
+        android:theme="@style/Theme.TitleBar"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".noticeActivity"
+            android:name=".NoticeActivity"
             android:exported="true" />
         <activity
             android:name=".WriteNoticeActivity"

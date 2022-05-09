@@ -8,6 +8,14 @@
         android:layout_height="match_parent"
         tools:context=".MenuActivity">
 
+        <Button
+            android:id="@+id/btnDestroy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="종료"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <FrameLayout
             android:id="@+id/frameLayout"
             android:layout_width="match_parent"
@@ -18,23 +26,29 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@+id/tv_Nick"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="200dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
         </FrameLayout>
+
+        <TextView
+            android:id="@+id/logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
+            android:fontFamily="@font/logo_font"
+            android:text="UNINOTE"
+            android:textColor="@color/uninote"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toTopOf="@id/LLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigationView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/white"
-            app:itemBackground="@android:color/white"
+            android:background="@color/uninote"
+            app:itemBackground="@color/uninote"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -55,8 +69,9 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
-                android:layout_marginLeft="30sp"
+                android:layout_marginLeft="20sp"
                 android:layout_marginTop="20sp"
+                android:layout_marginRight="20sp"
                 android:background="@drawable/bg_board"
                 android:gravity="center"
                 android:orientation="vertical">
@@ -66,8 +81,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10sp"
+                    android:fontFamily="@font/title_font2"
                     android:gravity="center"
-                    android:text="공지사항" />
+                    android:text="공지사항"
+                    android:textSize="16sp" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/annoRecycler"
@@ -84,10 +101,12 @@
                 android:id="@+id/freeLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_alignRight="@id/annoLayout"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentRight="true"
+                android:layout_marginLeft="20sp"
                 android:layout_marginTop="20sp"
-                android:layout_marginRight="30sp"
+                android:layout_marginRight="20sp"
                 android:background="@drawable/bg_board"
                 android:gravity="center"
                 android:orientation="vertical">
@@ -97,8 +116,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10sp"
+                    android:fontFamily="@font/title_font2"
                     android:gravity="center"
-                    android:text="자유게시판" />
+                    android:text="자유게시판"
+                    android:textSize="16sp" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/freeRecycler"
@@ -118,20 +139,23 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/annoLayout"
                 android:layout_alignParentLeft="true"
-                android:layout_marginLeft="30sp"
+                android:layout_marginLeft="20sp"
                 android:layout_marginTop="30sp"
+                android:layout_marginRight="20sp"
                 android:layout_marginBottom="20sp"
                 android:background="@drawable/bg_board"
                 android:gravity="center"
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/subPost"
+                    android:id="@+id/sugPost"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10sp"
+                    android:fontFamily="@font/title_font2"
                     android:gravity="center"
-                    android:text="추천 로드맵" />
+                    android:text="추천 로드맵"
+                    android:textSize="16sp" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/sugRecycler"
@@ -149,9 +173,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/freeLayout"
+                android:layout_alignRight="@id/sugLayout"
                 android:layout_alignParentRight="true"
+                android:layout_marginLeft="20sp"
                 android:layout_marginTop="30sp"
-                android:layout_marginRight="30sp"
+                android:layout_marginRight="20sp"
                 android:layout_marginBottom="20sp"
                 android:background="@drawable/bg_board"
                 android:gravity="center"
@@ -162,8 +188,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10sp"
+                    android:fontFamily="@font/title_font2"
                     android:gravity="center"
-                    android:text="게시판" />
+                    android:text="공부게시판"
+                    android:textSize="16sp" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/infoRecycler"

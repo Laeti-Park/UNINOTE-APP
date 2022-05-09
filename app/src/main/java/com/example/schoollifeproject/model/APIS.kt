@@ -1,38 +1,28 @@
 package com.example.schoollifeproject.model
 
-import android.net.Uri
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import okhttp3.MultipartBody
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 
-import retrofit2.http.POST
-import retrofit2.http.Multipart
-import retrofit2.http.Url
-
-import okhttp3.ResponseBody
-
-import retrofit2.http.GET
-
-
 /**
  * 서버 DB 연결 Interface
  * */
-
 interface APIS {
-    @FormUrlEncoded
-    @POST(MyApp.Select_url)
+
     @Headers(
         "accept: application/json",
         "content-type: application/x-www-form-urlencoded; charset=utf-8"
     )
-
     //로그인 정보 호출
+    @FormUrlEncoded
+    @POST(MyApp.login_url)
     fun login_users(
-        @Field("userID") userID: String
+        @Field("ID") userID: String
     ): Call<PostModel>
 
     //회원가입 정보 호출
@@ -47,21 +37,28 @@ interface APIS {
 
     //공지사항 호출
     @FormUrlEncoded
-    @POST(MyApp.notice_key_search_url)
+    @POST(MyApp.notice_load_url)
     fun notice_load(
-        @Field("type") type: Int
-    ): Call<List<Notice>>
+        @Field("dum") dum: Int
+    ): Call<List<NoticeListModel>>
 
     //게시글 호출
     @FormUrlEncoded
-    @POST(MyApp.notice_key_search_url)
+    @POST(MyApp.bbs_load_url)
     fun bbs_load(
-        @Field("type") type: Int
-    ): Call<List<Bbs>>
+        @Field("dum") dum: Int
+    ): Call<List<FreeListModel>>
+
+    //공부게시판 호출
+    @FormUrlEncoded
+    @POST(MyApp.info_load_url)
+    fun info_load(
+        @Field("dum") dum: Int
+    ): Call<List<InfoListModel>>
 
     //글작성
     @FormUrlEncoded
-    @POST(MyApp.notice_save_url)
+    @POST(MyApp.note_write_url)
     fun notice_save(
         @Field("noticeTitle") noticeTitle: String,
         @Field("userID") userID: String,
@@ -89,7 +86,7 @@ interface APIS {
     @POST(MyApp.item_load_url)
     fun item_load(
         @Field("userID") userID: String
-    ): Call<List<ItemInfo>>
+    ): Call<List<ItemModel>>
 
     @FormUrlEncoded
     @POST(MyApp.map_public_url)
@@ -142,11 +139,11 @@ interface APIS {
     @POST(MyApp.map_list_url)
     fun map_list(
         @Field("dum") dum: Int
-    ): Call<List<MapModel>>
+    ): Call<List<MapListModel>>
 
     companion object { // static 처럼 공유객체로 사용가능함. 모든 인스턴스가 공유하는 객체로서 동작함.
 
-        private const val BASE_URL = "http://192.168.0.6"
+        private const val BASE_URL = "https://hjk709914.cafe24.com"
         fun create(): APIS {
             val gson: Gson = GsonBuilder().setLenient().create();
             return Retrofit.Builder()

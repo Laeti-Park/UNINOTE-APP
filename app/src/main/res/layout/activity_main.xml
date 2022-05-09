@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".MainActivity">
@@ -12,54 +12,122 @@
             android:id="@+id/edit_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="312dp"
+            android:layout_marginTop="30dp"
             android:ems="10"
+            android:fontFamily="@font/title_font2"
             android:hint="아이디"
             android:inputType="textPersonName"
+            android:maxLength="20"
+            android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.502"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="34dp"
+            app:layout_constraintRight_toLeftOf="@id/edit_id"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/imageView"
+            app:srcCompat="@drawable/ic_main_user" />
 
         <EditText
             android:id="@+id/edit_pw"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="20dp"
             android:ems="10"
+            android:fontFamily="@font/title_font2"
             android:hint="비밀번호"
             android:inputType="textPassword"
+            android:maxLength="20"
+            android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.502"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/edit_id" />
 
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="24dp"
+            app:layout_constraintRight_toLeftOf="@id/edit_pw"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edit_id"
+            app:srcCompat="@drawable/ic_main_pass" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:gravity="center"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             app:layout_constraintTop_toBottomOf="@+id/edit_pw">
 
             <Button
                 android:id="@+id/btn_login"
-                android:layout_width="wrap_content"
+                android:layout_width="300sp"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="20dp"
-                android:text="로그인" />
+                android:layout_marginTop="20sp"
+                android:background="@drawable/bg_popup"
+                android:clickable="false"
+                android:fontFamily="@font/title_font1"
+                android:stateListAnimator="@null"
+                android:text="로그인"
+                android:textSize="20sp" />
 
             <Button
                 android:id="@+id/btn_register"
-                android:layout_width="wrap_content"
+                android:layout_width="300sp"
                 android:layout_height="wrap_content"
-                android:text="회원가입" />
+                android:layout_marginTop="20sp"
+                android:background="@drawable/bg_popup"
+                android:clickable="false"
+                android:fontFamily="@font/title_font1"
+                android:stateListAnimator="@null"
+                android:text="회원가입"
+                android:textSize="20sp" />
 
             <Button
                 android:id="@+id/btn_nonlogin"
-                android:layout_width="wrap_content"
+                android:layout_width="300sp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:text="비회원" />
+                android:layout_marginTop="20sp"
+                android:background="@drawable/bg_popup"
+                android:clickable="false"
+                android:fontFamily="@font/title_font1"
+                android:stateListAnimator="@null"
+                android:text="비회원"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/btnDestroy"
+                android:layout_width="300sp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20sp"
+                android:background="@drawable/bg_popup"
+                android:clickable="false"
+                android:fontFamily="@font/title_font1"
+                android:stateListAnimator="@null"
+                android:text="종료"
+                android:textSize="20sp" />
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="180sp"
+            android:layout_height="180sp"
+            android:layout_marginStart="50dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginEnd="50dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/uni_logo" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

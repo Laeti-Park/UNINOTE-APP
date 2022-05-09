@@ -5,7 +5,6 @@
         android:id="@+id/rootView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_list_item"
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="20sp">
@@ -21,15 +20,6 @@
             android:layout_height="40sp"
             android:layout_marginLeft="20sp"
             android:layout_marginRight="20sp" />
-
-        <Button
-            android:id="@+id/fileDownButton"
-            android:layout_width="60sp"
-            android:layout_height="30sp"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:text="다운로드"
-            android:visibility="gone" />
 
     </LinearLayout>
 </layout>

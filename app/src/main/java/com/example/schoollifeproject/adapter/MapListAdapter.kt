@@ -4,38 +4,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.schoollifeproject.databinding.ContactsListItemBinding
-import com.example.schoollifeproject.model.MapContacts
+import com.example.schoollifeproject.databinding.ContactsMainBoardBinding
+import com.example.schoollifeproject.model.MapListModel
 
+/**
+ * 메인메뉴 추천맵 RecyclerView Adapter
+ * 작성자 : 이준영, 박동훈
+ * */
+class MapListAdapter(private val itemList: List<MapListModel>) :
+    RecyclerView.Adapter<MapListAdapter.SugViewHolder>() {
 
-class MapListAdapter(private val itemList: MutableList<MapContacts>) :
-    RecyclerView.Adapter<MapListAdapter.ContactsMapViewHolder>() {
+    private lateinit var mapItemListener: OnMapItemClickListener
 
-    private val TAG = this.javaClass.toString()
-    private lateinit var mapListener: OnMapClickListener
-
-    fun setOnMapListener(mapListener: (View, String) -> Unit) {
-        this.mapListener = object : OnMapClickListener {
+    fun setOnMapItemListener(mapItemListener: (View, String) -> Unit) {
+        this.mapItemListener = object : OnMapItemClickListener {
             override fun onMapClick(view: View, mapID: String) {
-                mapListener(view, mapID)
+                mapItemListener(view, mapID)
             }
-        }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactsMapViewHolder {
-        val binding =
-            ContactsListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ContactsMapViewHolder(binding)
-    }
-
-    override fun onBindViewHolder(holder: ContactsMapViewHolder, position: Int) {
-        val item = itemList[position]
-        holder.apply {
-            bind(item)
-        }
-
-        holder.itemView.setOnClickListener {
-            mapListener.onMapClick(holder.itemView, item.mapID)
         }
     }
 
@@ -43,22 +28,33 @@ class MapListAdapter(private val itemList: MutableList<MapContacts>) :
         return itemList.size
     }
 
-    class ContactsMapViewHolder(private val binding: ContactsListItemBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        //게시판에 등록될 text, listener
-        fun bind(item: MapContacts) {
-            binding.title.text = "${item.mapID} 님의 로드맵"
-                //게시글 눌렀을 때 엑티비티 출현 (new박동훈) 새 액티비티 만들어서 맵만 나오게
-                /*val intent = Intent(itemView.context, ::class.java).apply{
-                    putExtra("mapID", item.mapID)
-                }
-                startActivity(itemView.context, intent, null)
-                */
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SugViewHolder {
+        val binding =
+            ContactsMainBoardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return SugViewHolder(binding)
+    }
 
+    override fun onBindViewHolder(holder: SugViewHolder, position: Int) {
+        val item = itemList[position]
+        holder.apply {
+            bind(item)
+        }
+
+        holder.itemView.setOnClickListener {
+            mapItemListener.onMapClick(holder.itemView, item.getMapID())
         }
     }
 
-    interface OnMapClickListener {
+
+    class SugViewHolder(private val binding: ContactsMainBoardBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        //추천맵에 등록될 text, listener
+        fun bind(item: MapListModel) {
+            binding.title.text = "${item.getMapID()}님의 로드맵"
+        }
+    }
+
+    interface OnMapItemClickListener {
         fun onMapClick(view: View, mapID: String)
     }
 }

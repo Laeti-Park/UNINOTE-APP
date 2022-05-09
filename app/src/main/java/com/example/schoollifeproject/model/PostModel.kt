@@ -42,7 +42,7 @@ data class PostModel(
     @SerializedName("itemCount")
     var itemCount: Int? = null,
     @Expose
-    @SerializedName("public")
+    @SerializedName("publicMap")
     var public: Int? = null,
     @Expose
     @SerializedName("mapPassword")

@@ -22,15 +22,17 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.VERTICAL
 import com.example.schoollifeproject.R
 import com.example.schoollifeproject.adapter.ItemAdapter
 import com.example.schoollifeproject.adapter.ItemFileAdapter
 import com.example.schoollifeproject.databinding.FragmentMindMapBinding
 import com.example.schoollifeproject.model.APIS
 import com.example.schoollifeproject.model.FileModel
-import com.example.schoollifeproject.model.ItemInfo
+import com.example.schoollifeproject.model.ItemModel
 import com.example.schoollifeproject.model.PostModel
 import com.gyso.treeview.TreeViewEditor
 import com.gyso.treeview.layout.CompactHorizonLeftAndRightLayoutManager
@@ -50,6 +52,10 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.*
 
+/**
+ * 로드맵 Fragment
+ * 작성자 : 박동훈
+ */
 
 class MindMapFragment : Fragment() {
     private val TAG = this.javaClass.toString()
@@ -74,6 +80,7 @@ class MindMapFragment : Fragment() {
     private lateinit var targetItemID: String
     private var downloadId: Long = -1L
     private lateinit var downloadManager: DownloadManager
+
     fun newInstance(userID: String, mapID: String): MindMapFragment {
         val args = Bundle()
         args.putString("userID", userID)
@@ -84,6 +91,7 @@ class MindMapFragment : Fragment() {
 
         return mindMapFragment
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -92,7 +100,7 @@ class MindMapFragment : Fragment() {
         binding = FragmentMindMapBinding.inflate(inflater, container, false)
         mapContext = context
 
-        userID = arguments?.getString("ID").toString() // menuActivity를 통해 받은 userID
+        userID = arguments?.getString("userID").toString() // menuActivity를 통해 받은 userID
         mapID = arguments?.getString("mapID").toString() // menuActivity를 통해 받은 userID
         Log.d("$TAG", "userID: ${userID}, ${mapID}")
         if (userID != mapID) {
@@ -102,38 +110,12 @@ class MindMapFragment : Fragment() {
 
         itemMaxNum = 0
 
+        publicCheck()
         initWidgets()
         return binding.root
     }
 
-    private fun initWidgets() {
-        val treeLayoutManager = getTreeLayoutManager()
-
-        binding.mapView.adapter = adapter
-        binding.mapView.setTreeLayoutManager(treeLayoutManager)
-
-        /**
-         * 마인드맵 기본 구성
-         */
-        val root: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("root", "root", null, null))
-        val mapView: TreeModel<ItemInfo> = TreeModel(root)
-
-        val grade1: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("grade1", "1학년", null, null))
-        grade1.value.setPosition(true)
-        val grade2: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("grade2", "2학년", null, null))
-        grade2.value.setPosition(true)
-        val grade3: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("grade3", "3학년", null, null))
-        grade3.value.setPosition(false)
-        val grade4: NodeModel<ItemInfo> = NodeModel<ItemInfo>(ItemInfo("grade4", "4학년", null, null))
-        grade4.value.setPosition(false)
-        mapView.addNode(root, grade3, grade4, grade1, grade2)
-        adapter.treeModel = mapView
-
-        /**
-         * 마인드맵 추가/제거 관련 객체
-         */
-        val editor: TreeViewEditor = binding.mapView.editor
-
+    private fun publicCheck() {
         /**
          * mapID 체크해 DB에서 마인드맵 공개여부 확인
          */
@@ -141,7 +123,7 @@ class MindMapFragment : Fragment() {
             override fun onResponse(call: Call<PostModel>, response: Response<PostModel>) {
                 Log.d(
                     "$TAG",
-                    "map_public: 리스폰 성공 ${response.body()?.error.toString()}"
+                    "map_public: 리스폰 성공 ${response.body()?.error.toString()}, ${adapter.mapEditable}"
                 )
                 if (response.body()?.error.toString() == "failed") {
                     mapPublic = true
@@ -150,6 +132,11 @@ class MindMapFragment : Fragment() {
                         mapPassword = response.body()?.mapPassword.toString()
                         binding.publicButton.setImageResource(R.drawable.ic_mindmap_private)
                         mapPublic = false
+
+                        if(!adapter.mapEditable) {
+                            binding.mapView.visibility = View.INVISIBLE
+                            publicSet(false)
+                        }
                     } else {
                         mapPublic = true
                     }
@@ -161,15 +148,46 @@ class MindMapFragment : Fragment() {
             }
         })
 
+    }
+
+
+    private fun initWidgets() {
+        val treeLayoutManager = getTreeLayoutManager()
+
+        binding.mapView.adapter = adapter
+        binding.mapView.setTreeLayoutManager(treeLayoutManager)
+
+        /**
+         * 마인드맵 기본 구성
+         */
+        val root: NodeModel<ItemModel> = NodeModel<ItemModel>(ItemModel("root", "root", null, null))
+        val mapView: TreeModel<ItemModel> = TreeModel(root)
+
+        val grade1: NodeModel<ItemModel> = NodeModel<ItemModel>(ItemModel("grade1", "1학년", null, null))
+        grade1.value.setPosition(true)
+        val grade2: NodeModel<ItemModel> = NodeModel<ItemModel>(ItemModel("grade2", "2학년", null, null))
+        grade2.value.setPosition(true)
+        val grade3: NodeModel<ItemModel> = NodeModel<ItemModel>(ItemModel("grade3", "3학년", null, null))
+        grade3.value.setPosition(false)
+        val grade4: NodeModel<ItemModel> = NodeModel<ItemModel>(ItemModel("grade4", "4학년", null, null))
+        grade4.value.setPosition(false)
+        mapView.addNode(root, grade3, grade4, grade1, grade2)
+        adapter.treeModel = mapView
+
+        /**
+         * 마인드맵 추가/제거 관련 객체
+         */
+        val editor: TreeViewEditor = binding.mapView.editor
+
         /**
          * mapID 체크해 DB에서 마인드맵 노드 불러오기
          */
-        api.item_load(mapID).enqueue(object : Callback<List<ItemInfo>> {
+        api.item_load(mapID).enqueue(object : Callback<List<ItemModel>> {
             override fun onResponse(
-                call: Call<List<ItemInfo>>,
-                response: Response<List<ItemInfo>>
+                call: Call<List<ItemModel>>,
+                response: Response<List<ItemModel>>
             ) {
-                val mapItems = HashMap<String, NodeModel<ItemInfo>>()
+                val mapItems = HashMap<String, NodeModel<ItemModel>>()
                 Log.d("${this.javaClass}", "item_load: 리스폰 성공")
                 if (response.body() != null) {
 
@@ -177,7 +195,7 @@ class MindMapFragment : Fragment() {
                         Log.d("$TAG", "item_load/itemID: ${i.getItemID()}")
                         i.setPosition(i.getItemID()[i.getItemID().length - 1].toString() == "L")
                         val last = if (i.getPosition()) "L" else "R"
-                        val item = NodeModel<ItemInfo>(i)
+                        val item = NodeModel<ItemModel>(i)
                         val childID = i.getItemID().split("_")[1].split("$last")[0]
                         mapItems[childID] = item
                     }
@@ -214,7 +232,7 @@ class MindMapFragment : Fragment() {
                 }
             }
 
-            override fun onFailure(call: Call<List<ItemInfo>>, t: Throwable) {
+            override fun onFailure(call: Call<List<ItemModel>>, t: Throwable) {
                 Log.d("$TAG", "item_load: 리스폰 실패 : $t")
             }
         })
@@ -254,9 +272,8 @@ class MindMapFragment : Fragment() {
     /**
      * DB에서 마인드맵 노드 삽입/삭제/변경
      */
-    private fun saveDB(item: NodeModel<ItemInfo>, view: View?, mode: String) {
-        // TODO: TOP이랑 LEFT값이 있는 경우 APP으로 설정하게 수정
-        // TODO: item에 해당하는 파일 DB와 파일 삭제?
+    private fun saveDB(item: NodeModel<ItemModel>, view: View?, mode: String) {
+
         val itemID = item.value.getItemID()
         val itemTop = "APP"
         val itemLeft = "APP"
@@ -306,47 +323,125 @@ class MindMapFragment : Fragment() {
         }
     }
 
-    private fun saveFileDB() {
-        // TODO : 파일 업로드 시 새로고침
+    private fun setItem(node: NodeModel<ItemModel>, editor: TreeViewEditor, b: Boolean) {
+
+        val setWindow: View =
+            LayoutInflater.from(mapContext).inflate(R.layout.window_item_set, null)
+        val itemSetWindow = PopupWindow(
+            setWindow,
+            ((requireContext().resources.displayMetrics.widthPixels) * 0.9).toInt(),
+            WindowManager.LayoutParams.WRAP_CONTENT
+        )
+
+        val setButton: Button = setWindow.findViewById(R.id.itemSetButton)
+        val setContent: EditText = setWindow.findViewById(R.id.setContentView)
+        val setNote: EditText = setWindow.findViewById(R.id.setNoteView)
+        val backButton: ImageButton = setWindow.findViewById(R.id.backButton)
+        val fileButton: Button = setWindow.findViewById(R.id.fileButton)
+
+        if (!b) {
+            setContent.isEnabled = false
+            setNote.isEnabled = false
+            setButton.visibility = View.GONE
+        }
+
+        setContent.setText(node.value.getContent())
+        setNote.setText(node.value.getNote())
+
+        itemSetWindow.isFocusable = true
+        itemSetWindow.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+        itemSetWindow.update()
+        itemSetWindow.showAtLocation(setWindow, Gravity.CENTER, 0, 0)
+
+        itemSetWindow.isOutsideTouchable = true
+        itemSetWindow.setTouchInterceptor { _, motionEvent ->
+            if (motionEvent.action == MotionEvent.ACTION_OUTSIDE) {
+                itemSetWindow.dismiss()
+            }
+            false
+        }
+
+        setButton.setOnClickListener {
+            val content = setContent.text.toString()
+            val note = setNote.text.toString()
+
+            if (content != "") {
+                val view = editor.container.getTreeViewHolder(node).view
+                node.value.setContent(content)
+                node.value.setNote(note)
+                view.findViewById<TextView>(R.id.content).text = content
+                saveDB(node, view, "update")
+                editor.focusMidLocation()
+                itemSetWindow.dismiss()
+            } else {
+                Toast.makeText(
+                    mapContext, "제목(내용)이 비어있습니다.", Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+
+        backButton.setOnClickListener {
+            itemSetWindow.dismiss()
+        }
+
+        fileButton.setOnClickListener {
+            itemSetWindow.dismiss()
+            saveFileDB(node, editor, b)
+        }
+    }
+
+    private fun saveFileDB(
+        node: NodeModel<ItemModel>,
+        editor: TreeViewEditor,
+        mapEditable: Boolean
+    ) {
         val fileList: MutableList<FileModel> = mutableListOf()
         val fileAdapter = ItemFileAdapter(fileList)
 
-        api.item_file_load(userID, targetItemID).enqueue(object : Callback<List<FileModel>> {
-            override fun onResponse(
-                call: Call<List<FileModel>>,
-                response: Response<List<FileModel>>
-            ) {
-                Log.d(
-                    "$TAG",
-                    "item_file_load: 리스폰 완료 ${response.body()!!.size}"
-                )
-                val list = mutableListOf<FileModel>()
-                for (i in 0 until response.body()!!.size) {
+        fun reload() {
+            api.item_file_load(mapID, targetItemID).enqueue(object : Callback<List<FileModel>> {
+                override fun onResponse(
+                    call: Call<List<FileModel>>,
+                    response: Response<List<FileModel>>
+                ) {
                     Log.d(
                         "$TAG",
-                        "item_file_load/fileName: ${response.body()!![i].getFileName()}, ${response.body()!![i].getFileRealName()}"
+                        "item_file_load: 리스폰 완료 ${response.body()!!.size}"
                     )
-                    val ar: List<String> = response.body()!![i].getFileName().split('.')
-                    val ext = ar[ar.size - 1]
+                    val list = mutableListOf<FileModel>()
+                    for (i in 0 until response.body()!!.size) {
+                        Log.d(
+                            "$TAG",
+                            "item_file_load/fileName: ${response.body()!![i].getFileName()}, ${response.body()!![i].getFileRealName()}"
+                        )
+                        val ar: List<String> = response.body()!![i].getFileName().split('.')
+                        val ext = ar[ar.size - 1]
 
-                    val contacts = (
-                            FileModel(
-                                response.body()!![i].getFileName(),
-                                response.body()!![i].getFileRealName(),
-                                ext
-                            )
-                            )
-                    list.add(contacts)
+                        val contacts = (
+                                FileModel(
+                                    response.body()!![i].getFileName(),
+                                    response.body()!![i].getFileRealName(),
+                                    ext
+                                )
+                                )
+                        list.add(contacts)
+                    }
+                    fileList.addAll(list)
+
+                    Log.d(
+                        "$TAG",
+                        "item_file_load/filesize: ${fileList.size}"
+                    )
+                    fileAdapter.notifyDataSetChanged()
                 }
-                fileList.clear()
-                fileList.addAll(list)
-                fileAdapter.notifyDataSetChanged()
-            }
 
-            override fun onFailure(call: Call<List<FileModel>>, t: Throwable) {
-                Log.d("$TAG", "item_file_load: 리스폰 실패")
-            }
-        })
+                override fun onFailure(call: Call<List<FileModel>>, t: Throwable) {
+                    Log.d("$TAG", "item_file_load: 리스폰 실패")
+                }
+            })
+        }
+
+        reload()
 
         val setWindow: View =
             LayoutInflater.from(mapContext).inflate(R.layout.window_item_file, null)
@@ -358,14 +453,25 @@ class MindMapFragment : Fragment() {
 
         val fileListView = setWindow.findViewById<RecyclerView>(R.id.fileListView)
         val fileAddButton = setWindow.findViewById<ImageButton>(R.id.fileAddButton)
-        val fileSetButton = setWindow.findViewById<ImageButton>(R.id.fileSetButton)
+        val backButton = setWindow.findViewById<ImageButton>(R.id.backButton)
+        val infoButton = setWindow.findViewById<Button>(R.id.infoButton)
+        val fileButton = setWindow.findViewById<Button>(R.id.fileButton)
+
+        if(!adapter.mapEditable) {
+            fileAddButton.visibility = View.GONE
+        }
 
         val mLayoutManager: RecyclerView.LayoutManager =
             LinearLayoutManager(mapContext)
         fileListView.setLayoutManager(mLayoutManager)
 
+        val dividerItemDecoration = DividerItemDecoration(mapContext, VERTICAL)
+        fileListView.addItemDecoration(dividerItemDecoration)
+
         fileListView.adapter = fileAdapter
 
+        fileSetWindow.isFocusable = true
+        fileSetWindow.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
         fileSetWindow.update()
         fileSetWindow.showAtLocation(setWindow, Gravity.CENTER, 0, 0)
 
@@ -384,8 +490,17 @@ class MindMapFragment : Fragment() {
             })
         }
 
-        fileSetButton.setOnClickListener {
+        backButton.setOnClickListener {
             fileSetWindow.dismiss()
+        }
+
+        infoButton.setOnClickListener {
+            fileSetWindow.dismiss()
+            setItem(node, editor, mapEditable)
+        }
+
+        fileButton.setOnClickListener {
+            reload()
         }
 
         fileAdapter.setOnFileListener { view, fileModel ->
@@ -453,6 +568,7 @@ class MindMapFragment : Fragment() {
 
         editor.container.isAnimateAdd = true
 
+        lateinit var fileNode: NodeModel<ItemModel>
         lateinit var formFile: MultipartBody.Part
 
         /**
@@ -475,23 +591,25 @@ class MindMapFragment : Fragment() {
 
                         // zip jpg png hwp pptx ppt
                         if (ext == "zip" || ext == "jpg" || ext == "png"
-                            || ext == "hwp" || ext == "ppt" || ext == "pptx") {
+                            || ext == "hwp" || ext == "ppt" || ext == "pptx"
+                        ) {
                             Log.d("$TAG", "resultlauncher: $ext")
-                            api.item_file_save(formFile, userID, targetItemID).enqueue(object : Callback<String> {
-                                override fun onResponse(
-                                    call: Call<String>,
-                                    response: Response<String>
-                                ) {
-                                    Log.d(
-                                        "$TAG",
-                                        "item_file_save: 리스폰 완료 ${response.body()}"
-                                    )
-                                }
+                            api.item_file_save(formFile, userID, targetItemID)
+                                .enqueue(object : Callback<String> {
+                                    override fun onResponse(
+                                        call: Call<String>,
+                                        response: Response<String>
+                                    ) {
+                                        Log.d(
+                                            "$TAG",
+                                            "item_file_save: 리스폰 완료 ${response.body()}"
+                                        )
+                                    }
 
-                                override fun onFailure(call: Call<String>, t: Throwable) {
-                                    Log.d("$TAG", "item_file_save: 리스폰 실패 $t")
-                                }
-                            })
+                                    override fun onFailure(call: Call<String>, t: Throwable) {
+                                        Log.d("$TAG", "item_file_save: 리스폰 실패 $t")
+                                    }
+                                })
                         } else {
                             Toast.makeText(
                                 mapContext,
@@ -499,8 +617,8 @@ class MindMapFragment : Fragment() {
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
-                        saveFileDB()
                     }
+                    saveFileDB(fileNode, editor, adapter.mapEditable)
                 }
             })
 
@@ -512,9 +630,10 @@ class MindMapFragment : Fragment() {
          * 하단 메뉴 4 : 노드 파일 설정
          */
         adapter.setOnItemListener { view, node ->
-            val d = Log.d("$TAG", "setOnItemListener: ${node.value.getItemID()}")
+            Log.d("$TAG", "setOnItemListener: ${node.value.getItemID()}")
             val id = node.value.getItemID()
             if (id != "root") {
+                fileNode = node
                 targetItemID = node.value.getItemID()
                 val visible =
                     id != "grade1" && id != "grade2" && id != "grade3" && id != "grade4"
@@ -522,6 +641,7 @@ class MindMapFragment : Fragment() {
                 binding.bottomNavigationView.menu.findItem(R.id.bottomMenu3).isVisible = visible
                 binding.bottomNavigationView.menu.findItem(R.id.bottomMenu4).isVisible = visible
                 binding.bottomNavigationView.visibility = View.VISIBLE
+
                 binding.bottomNavigationView.run {
                     setOnItemSelectedListener { item ->
                         when (item.itemId) {
@@ -531,9 +651,9 @@ class MindMapFragment : Fragment() {
                                     if (visible) node.value.getItemID()
                                         .split("_")[1].split("$last")[0]
                                     else node.value.getItemID().split("_")[0]
-                                val item: NodeModel<ItemInfo> =
-                                    NodeModel<ItemInfo>(
-                                        ItemInfo(
+                                val item: NodeModel<ItemModel> =
+                                    NodeModel<ItemModel>(
+                                        ItemModel(
                                             "${parent}_item${itemMaxNum}$last",
                                             "ChildNode",
                                             itemMaxNum++,
@@ -546,13 +666,13 @@ class MindMapFragment : Fragment() {
                                 )
                                 editor.addChildNodes(node, item)
                                 saveDB(item, null, "insert")
-                                binding.bottomNavigationView.visibility = View.INVISIBLE
+                                binding.bottomNavigationView.visibility = View.GONE
                                 true
                             }
                             R.id.bottomMenu2 -> {
                                 setItem(node, editor, true)
                                 "setOnItemListener/bottomMenu2: ${node.value.getItemID()}"
-                                binding.bottomNavigationView.visibility = View.INVISIBLE
+                                binding.bottomNavigationView.visibility = View.GONE
                                 true
                             }
                             R.id.bottomMenu3 -> {
@@ -602,10 +722,12 @@ class MindMapFragment : Fragment() {
                                 cancelButton.setOnClickListener {
                                     warnSetWindow.dismiss()
                                 }
+                                binding.bottomNavigationView.visibility = View.GONE
                                 true
                             }
                             R.id.bottomMenu4 -> {
-                                saveFileDB()
+                                saveFileDB(node, editor, adapter.mapEditable)
+                                binding.bottomNavigationView.visibility = View.GONE
                                 true
                             }
                             else -> {
@@ -636,6 +758,7 @@ class MindMapFragment : Fragment() {
          * 노드 제목/내용 설정
          */
         adapter.setOnItemDoubleListener { item, node, b ->
+            targetItemID = node.value.getItemID()
             val id = node.value.getItemID()
             if (id != "root" && id != "grade1" && id != "grade2" && id != "grade3" && id != "grade4") {
                 setItem(node, editor, b)
@@ -648,78 +771,7 @@ class MindMapFragment : Fragment() {
          */
         binding.publicButton.setOnClickListener {
             // TODO : public 버튼 오류
-            val setWindow: View =
-                LayoutInflater.from(mapContext).inflate(R.layout.window_map_public_set, null)
-            val publicSetWindow = PopupWindow(
-                setWindow,
-                ((requireContext().resources.displayMetrics.widthPixels) * 0.6).toInt(),
-                WindowManager.LayoutParams.WRAP_CONTENT
-            )
-
-            publicSetWindow.isFocusable = true
-            publicSetWindow.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
-            publicSetWindow.update()
-            publicSetWindow.showAtLocation(setWindow, Gravity.CENTER, 0, 0)
-
-            publicSetWindow.isOutsideTouchable = true
-            publicSetWindow.setTouchInterceptor { _, motionEvent ->
-                if (motionEvent.action == MotionEvent.ACTION_OUTSIDE) {
-                    publicSetWindow.dismiss()
-                }
-                false
-            }
-
-            val setPublicText: TextView = setWindow.findViewById(R.id.passwordText)
-            val setPublicButton: Button = setWindow.findViewById(R.id.pwButton)
-            val setPassword: EditText = setWindow.findViewById(R.id.setPassword)
-
-            if (mapPublic) {
-                setPublicText.text = "패스워드를 입력하세요.(10자)"
-            } else {
-                setPassword.visibility = View.GONE
-                setPublicText.text = "공개로 전환하시겠습니까?"
-            }
-
-            fun savePublic(i: Int, password: String) {
-                api.map_update(userID, i, password).enqueue(object : Callback<PostModel> {
-                    override fun onResponse(
-                        call: Call<PostModel>,
-                        response: Response<PostModel>
-                    ) {
-                        Log.d("$TAG", "map_update: 리스폰 성공 ")
-                    }
-
-                    override fun onFailure(call: Call<PostModel>, t: Throwable) {
-                        Log.d("$TAG", "map_update: 리스폰 실패 : $t")
-                    }
-                })
-            }
-
-            setPublicButton.setOnClickListener {
-                val password = setPassword.text.toString()
-                if (mapPublic) {
-                    when {
-                        password != "" -> {
-                            mapPassword = password
-                            savePublic(0, password)
-                            mapPublic = false
-                            binding.publicButton.setImageResource(R.drawable.ic_mindmap_private)
-                            publicSetWindow.dismiss()
-                        }
-                        else -> {
-                            Toast.makeText(
-                                mapContext, "패스워드가 비어있습니다.", Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-                } else {
-                    mapPassword = password
-                    savePublic(1, "")
-                    mapPublic = true
-                    binding.publicButton.setImageResource(R.drawable.ic_mindmap_public)
-                    publicSetWindow.dismiss()
-                }
-            }
+            publicSet(this.adapter.mapEditable)
         }
 
         //treeView control listener
@@ -759,8 +811,8 @@ class MindMapFragment : Fragment() {
                 if (draggingNode != null && hittingNode != null) {
                     Log.d(
                         "$TAG",
-                        "onDragMoveNodesHit: draging[${(draggingNode.value as ItemInfo).getItemID()}]" +
-                                "hittingNode[${(hittingNode.value as ItemInfo).getItemID()}]"
+                        "onDragMoveNodesHit: draging[${(draggingNode.value as ItemModel).getItemID()}]" +
+                                "hittingNode[${(hittingNode.value as ItemModel).getItemID()}]"
                     )
                 }
             }
@@ -774,13 +826,13 @@ class MindMapFragment : Fragment() {
                 if (draggingNode != null && hittingNode != null) {
                     Log.d(
                         "$TAG",
-                        "onDragMoveNodesEnd: draging[${(draggingNode.value as ItemInfo).getItemID()}]" +
-                                "hittingNode[${(hittingNode.value as ItemInfo).getItemID()}]"
+                        "onDragMoveNodesEnd: draging[${(draggingNode.value as ItemModel).getItemID()}]" +
+                                "hittingNode[${(hittingNode.value as ItemModel).getItemID()}]"
                     )
-                    val dNode = draggingNode.value as ItemInfo
-                    val hNode = hittingNode.value as ItemInfo
+                    val dNode = draggingNode.value as ItemModel
+                    val hNode = hittingNode.value as ItemModel
 
-                    val hLast = if ((hittingNode.value as ItemInfo).getPosition()) "L" else "R"
+                    val hLast = if ((hittingNode.value as ItemModel).getPosition()) "L" else "R"
                     targetItemID = dNode.getItemID()
                     val parent =
                         if (hNode.getItemID() != "root" && hNode.getItemID() != "grade1" && hNode.getItemID() != "grade2" &&
@@ -799,7 +851,7 @@ class MindMapFragment : Fragment() {
                     Log.d("$TAG", "dNodeItemID: ${dNode.getItemID()}")
                     if (draggingView != null) {
                         Log.d("$TAG", "dNodeItemID/targetItemID: ${targetItemID}")
-                        saveDB(draggingNode as NodeModel<ItemInfo>, draggingView, "update")
+                        saveDB(draggingNode as NodeModel<ItemModel>, draggingView, "update")
                     }
                 }
             }
@@ -837,7 +889,9 @@ class MindMapFragment : Fragment() {
                         binding.mapRecommend.text = mapRecommend.toString()
                     }
                     if (response.body()?.error.toString() == "failed") {
-
+                        Toast.makeText(
+                            mapContext, "이미 추천했습니다.", Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
 
@@ -848,61 +902,95 @@ class MindMapFragment : Fragment() {
         }
     }
 
-    private fun setItem(node: NodeModel<ItemInfo>, editor: TreeViewEditor, b: Boolean) {
-
+    private fun publicSet(b: Boolean) {
         val setWindow: View =
-            LayoutInflater.from(mapContext).inflate(R.layout.window_item_set, null)
-        val itemSetWindow = PopupWindow(
+            LayoutInflater.from(mapContext).inflate(R.layout.window_map_public_set, null)
+        val publicSetWindow = PopupWindow(
             setWindow,
-            ((requireContext().resources.displayMetrics.widthPixels) * 0.8).toInt(),
+            ((requireContext().resources.displayMetrics.widthPixels) * 0.6).toInt(),
             WindowManager.LayoutParams.WRAP_CONTENT
         )
 
-        val setButton: Button = setWindow.findViewById(R.id.itemSetButton)
-        val setContent: EditText = setWindow.findViewById(R.id.setContentView)
-        val setNote: EditText = setWindow.findViewById(R.id.setNoteView)
+        publicSetWindow.isFocusable = true
+        publicSetWindow.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
 
-        if (!b) {
-            setContent.isEnabled = false
-            setNote.isEnabled = false
-        }
+        publicSetWindow.update()
+        publicSetWindow.showAtLocation(setWindow, Gravity.CENTER, 0, 0)
 
-        setContent.setText(node.value.getContent())
-        setNote.setText(node.value.getNote())
-
-        itemSetWindow.isFocusable = true
-        itemSetWindow.softInputMode = WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
-        itemSetWindow.update()
-        itemSetWindow.showAtLocation(setWindow, Gravity.CENTER, 0, 0)
-
-        itemSetWindow.isOutsideTouchable = true
-        itemSetWindow.setTouchInterceptor { _, motionEvent ->
+        publicSetWindow.isOutsideTouchable = true
+        publicSetWindow.setTouchInterceptor { _, motionEvent ->
             if (motionEvent.action == MotionEvent.ACTION_OUTSIDE) {
-                itemSetWindow.dismiss()
+                publicSetWindow.dismiss()
             }
             false
         }
 
-        setButton.setOnClickListener {
-            if (b) {
-                val content = setContent.text.toString()
-                val note = setNote.text.toString()
+        val setPublicText: TextView = setWindow.findViewById(R.id.passwordText)
+        val setPublicButton: Button = setWindow.findViewById(R.id.pwButton)
+        val setPassword: EditText = setWindow.findViewById(R.id.setPassword)
 
-                if (content != "") {
-                    val view = editor.container.getTreeViewHolder(node).view
-                    node.value.setContent(content)
-                    node.value.setNote(note)
-                    view.findViewById<TextView>(R.id.content).text = content
-                    saveDB(node, view, "update")
-                    editor.focusMidLocation()
-                    itemSetWindow.dismiss()
+        if (!mapPublic && b) {
+            setPassword.visibility = View.GONE
+            setPublicText.text = "공개로 전환하시겠습니까?"
+        } else {
+            setPublicText.text = "패스워드를 입력하세요.(10자)"
+        }
+
+        fun savePublic(i: Int, password: String) {
+            api.map_update(userID, i, password).enqueue(object : Callback<PostModel> {
+                override fun onResponse(
+                    call: Call<PostModel>,
+                    response: Response<PostModel>
+                ) {
+                    Log.d("$TAG", "map_update: 리스폰 성공 ${response.body()!!.error}")
+                }
+
+                override fun onFailure(call: Call<PostModel>, t: Throwable) {
+                    Log.d("$TAG", "map_update: 리스폰 실패 : $t")
+                }
+            })
+        }
+
+        setPublicButton.setOnClickListener {
+            val password = setPassword.text.toString()
+            if(b) {
+                if (mapPublic) {
+                    when {
+                        password != "" -> {
+                            mapPassword = password
+                            savePublic(0, password)
+                            mapPublic = false
+                            binding.publicButton.setImageResource(R.drawable.ic_mindmap_private)
+                            publicSetWindow.dismiss()
+                        }
+                        else -> {
+                            Toast.makeText(
+                                mapContext, "패스워드가 비어있습니다.", Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
                 } else {
-                    Toast.makeText(
-                        mapContext, "제목(내용)이 비어있습니다.", Toast.LENGTH_SHORT
-                    ).show()
+                    mapPassword = password
+                    savePublic(1, "")
+                    mapPublic = true
+                    binding.publicButton.setImageResource(R.drawable.ic_mindmap_public)
+                    publicSetWindow.dismiss()
                 }
             } else {
-                itemSetWindow.dismiss()
+                when {
+                    password != mapPassword || password == "" -> {
+                        Toast.makeText(
+                            mapContext, "비밀번호가 틀렸습니다.", Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    else -> {
+                        Toast.makeText(
+                            mapContext, "패스워드 입력을 완료했습니다.", Toast.LENGTH_SHORT
+                        ).show()
+                        binding.mapView.visibility = View.VISIBLE
+                        publicSetWindow.dismiss()
+                    }
+                }
             }
         }
     }

@@ -8,72 +8,171 @@
         android:layout_height="match_parent"
         tools:context=".RegisterActivity">
 
-        <EditText
-            android:id="@+id/edit_id"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:hint="아이디"
-            android:inputType="textPersonName"
-            app:layout_constraintBottom_toTopOf="@+id/edit_name"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent" />
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="4dp"
+            android:fontFamily="@font/title_font2"
+            android:text="아이디"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toStartOf="@+id/edit_id"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/welcome2" />
 
         <EditText
-            android:id="@+id/edit_name"
+            android:id="@+id/edit_id"
+            android:layout_width="200sp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/title_font1"
+            android:gravity="left"
+            android:hint="아이디"
+            android:inputType="textPersonName"
+            android:maxLength="20"
+            android:minHeight="48dp"
+            android:textSize="20sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/welcome2" />
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:hint="닉네임"
-            android:inputType="textPersonName"
-            app:layout_constraintBottom_toTopOf="@+id/edit_pw"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent" />
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="4dp"
+            android:fontFamily="@font/title_font2"
+            android:text="비밀번호"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toStartOf="@+id/edit_pw"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_id" />
 
         <EditText
             android:id="@+id/edit_pw"
-            android:layout_width="wrap_content"
+            android:layout_width="200sp"
             android:layout_height="wrap_content"
-            android:gravity="center"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/title_font1"
+            android:gravity="left"
             android:hint="비밀번호"
             android:inputType="textPassword"
-            app:layout_constraintBottom_toTopOf="@+id/edit_pw_re"
+            android:maxLength="20"
+            android:textSize="20sp"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent" />
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_id" />
 
         <EditText
             android:id="@+id/edit_pw_re"
-            android:layout_width="wrap_content"
+            android:layout_width="200sp"
             android:layout_height="wrap_content"
-            android:gravity="center"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/title_font1"
+            android:gravity="left"
             android:hint="비밀번호 확인"
             android:inputType="textPassword"
-            app:layout_constraintBottom_toTopOf="@+id/edit_email"
+            android:maxLength="20"
+            android:textSize="20sp"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent" />
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_pw" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="4dp"
+            android:fontFamily="@font/title_font2"
+            android:text="닉네임"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toStartOf="@id/edit_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_pw_re" />
+
+        <EditText
+            android:id="@+id/edit_name"
+            android:layout_width="200sp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/title_font1"
+            android:gravity="left"
+            android:hint="닉네임"
+            android:inputType="textPersonName"
+            android:maxLength="20"
+            android:textSize="20sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_pw_re" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="4dp"
+            android:fontFamily="@font/title_font2"
+            android:text="이메일"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toStartOf="@id/edit_email"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_name" />
 
         <EditText
             android:id="@+id/edit_email"
-            android:layout_width="wrap_content"
+            android:layout_width="200sp"
             android:layout_height="wrap_content"
-            android:gravity="center"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/title_font1"
+            android:gravity="left"
             android:hint="이메일"
             android:inputType="textPersonName"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:textSize="20sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/edit_name" />
 
 
         <Button
             android:id="@+id/btn_register"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:background="@drawable/bg_popup"
+            android:fontFamily="@font/title_font1"
+            android:minWidth="200sp"
             android:text="회원가입"
+            android:textSize="20sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/edit_email" />
+
+        <TextView
+            android:id="@+id/welcome1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:fontFamily="@font/logo_font"
+            android:text="UNINOTE 회원가입"
+            android:textColor="@color/uninote"
+            android:textSize="34sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/welcome2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/title_font1"
+            android:text="UNINOTE에 오신 걸 환영합니다."
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/welcome1" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

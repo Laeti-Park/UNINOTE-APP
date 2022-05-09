@@ -11,32 +11,65 @@
             android:id="@+id/fileAddButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="26dp"
+            app:layout_constraintStart_toEndOf="@+id/fileButton"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_baseline_attach_file_24" />
-
-        <ImageButton
-            android:id="@+id/fileSetButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:textColor="#1E1E1E"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_baseline_arrow_back_24" />
+            app:srcCompat="@drawable/ic_mindmap_add_file" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/fileListView"
-            android:layout_width="0dp"
-            android:layout_height="400sp"
+            android:layout_width="0sp"
+            android:layout_height="200sp"
             android:layout_marginTop="20sp"
+            android:clipToPadding="false"
             android:padding="6sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/fileSetButton" />
+            app:layout_constraintTop_toBottomOf="@id/backButton" />
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16sp"
+            android:layout_marginTop="16sp"
+            android:backgroundTint="@color/uninote"
+            android:textColor="#1E1E1E"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_mindmap_back" />
+
+        <Button
+            android:id="@+id/infoButton"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24sp"
+            android:fontFamily="@font/title_font2"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:stateListAnimator="@null"
+            android:text="아이템 정보"
+            android:textColor="#646464"
+            android:textSize="20sp"
+            app:layout_constraintLeft_toRightOf="@id/backButton"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/fileButton"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24sp"
+            android:fontFamily="@font/title_font2"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:stateListAnimator="@null"
+            android:text="파일 정보"
+            android:textColor="#3F51B5"
+            android:textSize="20sp"
+            app:layout_constraintLeft_toRightOf="@id/infoButton"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

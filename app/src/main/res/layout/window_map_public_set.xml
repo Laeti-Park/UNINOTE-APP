@@ -6,49 +6,54 @@
     android:background="@drawable/bg_popup"
     android:padding="20dp">
 
-  <TextView
-      android:id="@+id/passwordText"
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="4dp"
-      android:gravity="center"
-      android:text="패스워드를 입력해주세요."
-      android:textColor="#1E1E1E"
-      android:textSize="14sp"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+        android:id="@+id/passwordText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:fontFamily="@font/title_font2"
+        android:gravity="center"
+        android:text="패스워드를 입력해주세요."
+        android:textColor="#1E1E1E"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-  <EditText
-      android:id="@+id/setPassword"
-      android:layout_width="200sp"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="10dp"
-      android:gravity="start|top|left"
-      android:hint="내용을 입력해주세요."
-      android:importantForAutofill="no"
-      android:inputType="text"
-      android:maxLines="1"
-      android:minHeight="48dp"
-      android:textIsSelectable="true"
-      android:textSize="16sp"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/passwordText" />
+    <EditText
+        android:id="@+id/setPassword"
+        android:layout_width="200sp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:fontFamily="@font/title_font1"
+        android:gravity="start|top|left"
+        android:hint="내용을 입력해주세요."
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:maxLines="1"
+        android:minHeight="48dp"
+        android:textIsSelectable="true"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/passwordText" />
 
-  <Button
-      android:id="@+id/pwButton"
-      style="@style/Widget.AppCompat.Button.Borderless"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="50dp"
-      android:layout_marginTop="20dp"
-      android:layout_marginEnd="50dp"
-      android:text="확인"
-      android:textColor="#FF1E1E1E"
-      android:textSize="16sp"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/setPassword" />
+    <Button
+        android:id="@+id/pwButton"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="50dp"
+        android:fontFamily="@font/title_font1"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:text="확인"
+        android:textColor="#FF1E1E1E"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/setPassword" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

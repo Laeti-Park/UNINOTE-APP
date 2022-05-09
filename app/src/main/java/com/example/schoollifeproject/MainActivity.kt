@@ -19,8 +19,8 @@ import retrofit2.Response
 
 /**
  * 어플 실행 로그인 Activity
- * */
-
+ * 작성자 : 이준영
+ */
 class MainActivity : AppCompatActivity() {
 
     val TAG: String = "MainActivity"
@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 
         /**
          * 파일관리자 접근 권한 설정
-         * */
+         */
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(
                     applicationContext,
