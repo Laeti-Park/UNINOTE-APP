@@ -10,25 +10,22 @@ class NoticeListModel(
     @Expose
     @SerializedName("noticeID")
     private var noticeID: Int,
-
     @Expose
     @SerializedName("noticeTitle")
     private var noticeTitle: String,
-
     @Expose
     @SerializedName("userID")
     private var userID: String,
-
     @Expose
     @SerializedName("noticeDate")
     private var noticeDate: String,
     @Expose
     @SerializedName("noticeContent")
     private var noticeContent: String,
-
     @Expose
     @SerializedName("noticeAvailable")
     private var noticeAvailable: Int
+
 ) {
 
     fun getNoticeKey(): Int {
@@ -50,7 +47,6 @@ class NoticeListModel(
     fun getNoticeContent(): String {
         return noticeContent
     }
-
     fun getNoticeAvailable(): Int {
         return noticeAvailable
     }

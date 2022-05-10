@@ -9,6 +9,9 @@ import java.io.File
  * */
 data class PostModel(
     @Expose
+    @SerializedName("type")
+    var type: Int? = null,
+    @Expose
     @SerializedName("userID")
     var userID: String? = null,
     @Expose

@@ -8,6 +8,7 @@ import androidx.appcompat.app.AlertDialog
 import com.example.schoollifeproject.databinding.ActivityRegisterBinding
 import com.example.schoollifeproject.model.APIS
 import com.example.schoollifeproject.model.PostModel
+import com.example.schoollifeproject.shared.Shared
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -42,10 +43,13 @@ class RegisterActivity : AppCompatActivity() {
             if (id.isBlank() || pw.isBlank() || rePw.isBlank() || name.isBlank() || email.isBlank()) {
                 isExistBlank = true
             } else {
+                //비밀번호 확인
                 if (pw == rePw) isPWSame = true
             }
 
-            if (!isExistBlank && isPWSame) {
+            if (id == "nothing" || id == "Admin") {
+                dialog("nothingID")
+            } else if (!isExistBlank && isPWSame) {
 
                 api.register_users(
                     id, pw, name, email
@@ -87,6 +91,9 @@ class RegisterActivity : AppCompatActivity() {
         } else if (type == "success") {
             dialog.setTitle("회원가입 성공")
             dialog.setMessage("환영합니다.")
+        }else if (type == "nothing") {
+            dialog.setTitle("회원가입 실패")
+            dialog.setMessage("사용할 수 없는 아이디입니다.")
         }
 
         val dialog_litener = DialogInterface.OnClickListener { _, _ ->

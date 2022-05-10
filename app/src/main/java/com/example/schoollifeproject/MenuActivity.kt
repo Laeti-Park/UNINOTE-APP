@@ -1,12 +1,17 @@
 package com.example.schoollifeproject
 
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.schoollifeproject.adapter.AnnoListAdapter
 import com.example.schoollifeproject.adapter.FreeListAdapter
@@ -15,9 +20,11 @@ import com.example.schoollifeproject.adapter.MapListAdapter
 import com.example.schoollifeproject.databinding.ActivityMenuBinding
 import com.example.schoollifeproject.fragment.*
 import com.example.schoollifeproject.model.*
+import com.example.schoollifeproject.shared.Shared
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.system.exitProcess
 
 /**
  * 로그인 후 메뉴 Activity
@@ -26,7 +33,6 @@ import retrofit2.Response
 
 // TODO : menu-자유게시판, contacts_main_board.xml, Fragment-공지사항/공부게시판, 디자인
 class MenuActivity : AppCompatActivity() {
-    private val TAG = this.javaClass.toString()
     private val annoContactsList: MutableList<NoticeListModel> = mutableListOf()
     private val mapContactsList: MutableList<MapListModel> = mutableListOf()
     private val freeContactslist: MutableList<FreeListModel> = mutableListOf()
@@ -37,24 +43,47 @@ class MenuActivity : AppCompatActivity() {
     private val freeAdapter = FreeListAdapter(freeContactslist)
     private val infoAdapter = InfoListAdapter(infoContactsList)
 
-    private lateinit var userID: String
-    private lateinit var userName: String
+    private var backWait: Long = 0
     private var loginCK: Int = 0
+    private lateinit var userID: String
+    private lateinit var userPW: String
+    private lateinit var userName: String
+
+    private lateinit var annoText: TextView
+    private lateinit var sugText: TextView
+    private lateinit var freeText: TextView
+    private lateinit var infoText: TextView
 
     private lateinit var binding: ActivityMenuBinding
+    private val api = APIS.create()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMenuBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val api = APIS.create()
 
         val dividerItemDecoration = DividerItemDecoration(applicationContext, RecyclerView.VERTICAL)
+        val freeManager = LinearLayoutManager(applicationContext)
+        freeManager.reverseLayout = true
+        freeManager.stackFromEnd = true
+        val annoManager = LinearLayoutManager(applicationContext)
+        annoManager.reverseLayout = true
+        annoManager.stackFromEnd = true
+        val infoManager = LinearLayoutManager(applicationContext)
+        infoManager.reverseLayout = true
+        infoManager.stackFromEnd = true
+
+        binding.annoRecycler.layoutManager = annoManager
+        binding.infoRecycler.layoutManager = infoManager
+        binding.freeRecycler.layoutManager = freeManager
+
         binding.annoRecycler.addItemDecoration(dividerItemDecoration)
         binding.sugRecycler.addItemDecoration(dividerItemDecoration)
         binding.freeRecycler.addItemDecoration(dividerItemDecoration)
         binding.infoRecycler.addItemDecoration(dividerItemDecoration)
+
+
 
         binding.annoRecycler.adapter = annoAdapter
         binding.sugRecycler.adapter = mapAdapter
@@ -62,14 +91,29 @@ class MenuActivity : AppCompatActivity() {
         binding.infoRecycler.adapter = infoAdapter
 
         userID = intent.getStringExtra("ID").toString()
+        userPW = intent.getStringExtra("PW").toString()
         userName = intent.getStringExtra("name").toString()
         loginCK = intent.getIntExtra("loginCheck", 0)
 
-        val annoText = binding.annoPost
-        val sugText = binding.sugPost
-        val freeText = binding.freePost
-        val infoText = binding.infoPost
+        annoText = binding.annoPost
+        sugText = binding.sugPost
+        freeText = binding.freePost
+        infoText = binding.infoPost
 
+        /**
+         * 로그인 백업
+         */
+        if (userID != "비회원") {
+            Shared.prefs.setString("id", userID)
+            Shared.prefs.setString("pw", userPW)
+        } else {
+            Shared.prefs.setString("id", "nothing")
+            Shared.prefs.setString("pw", "nothing")
+        }
+
+        /**
+         * 메인메뉴 게시판 제목 클릭 이벤트
+         */
         annoText.setOnClickListener {
             val transaction = supportFragmentManager.beginTransaction()
             val annoListFragment = AnnoListFragment()
@@ -98,19 +142,20 @@ class MenuActivity : AppCompatActivity() {
                 .commitAllowingStateLoss()
             menuMainVisible(false)
         }
-        mapAdapter.setOnMapItemListener { view, mapID ->
-            val mindMapFragment = MindMapFragment()
+        mapAdapter.setOnMapItemListener { _, mapID ->
             val transaction = supportFragmentManager.beginTransaction()
-            Log.d("$TAG", "userIDSend: ${userID}, $mapID")
-
-            menuMainVisible(false)
-
+            val mindMapFragment = MindMapFragment()
             transaction?.replace(R.id.frameLayout, mindMapFragment.newInstance(userID, mapID))
                 ?.commitAllowingStateLoss()
+            menuMainVisible(false)
         }
 
         /**
-         * 메인메뉴의 공지사항 DB 불러오기
+         * 메인메뉴 게시판 DB 불러오기
+         * notice = 공지사항
+         * bbs = 자유게시판
+         * info = 스터디
+         * maplist = 추천로드맵
          * */
         //type 0 = 일반 포스팅, type 1 = 공지 포스팅
         api.notice_load(1).enqueue(
@@ -146,18 +191,20 @@ class MenuActivity : AppCompatActivity() {
                 response: Response<List<FreeListModel>>
             ) {
                 for (i in response.body()!!) {
-                    val contacts = (
-                            FreeListModel(
-                                i.getBbsKey(),
-                                i.getBbsTitle(),
-                                i.getBbsWriter(),
-                                i.getBbsDate(),
-                                i.getBbsContent(),
-                                i.getBbsAvailable()
-                            )
-                            )
-                    freeContactslist.add(contacts)
-                    freeAdapter.notifyDataSetChanged()
+                    if (i.getBbsAvailable() == 1) {
+                        val contacts = (
+                                FreeListModel(
+                                    i.getBbsKey(),
+                                    i.getBbsTitle(),
+                                    i.getBbsWriter(),
+                                    i.getBbsDate(),
+                                    i.getBbsContent(),
+                                    i.getBbsAvailable()
+                                )
+                                )
+                        freeContactslist.add(contacts)
+                        freeAdapter.notifyDataSetChanged()
+                    }
                 }
             }
 
@@ -228,7 +275,6 @@ class MenuActivity : AppCompatActivity() {
         binding.bottomNavigationView.run {
             val mindMapFragment = MindMapFragment()
             val freeListFragment = FreeListFragment()
-            val mapListFragment = MapListFragment()
             val settingsFragment = SettingsFragment()
 
             setOnItemSelectedListener { item ->
@@ -243,8 +289,7 @@ class MenuActivity : AppCompatActivity() {
                         true
                     }
                     R.id.mainMenu2 -> {
-                        if (userID == "비회원")
-                            failDialog()
+                        if (userID == "비회원") failDialog()
                         else {
                             transaction.replace(
                                 R.id.frameLayout,
@@ -268,9 +313,10 @@ class MenuActivity : AppCompatActivity() {
                         true
                     }
                 }
-
             }
         }
+
+
     }
 
     private fun removeFragment() {
@@ -304,5 +350,35 @@ class MenuActivity : AppCompatActivity() {
             binding.infoLayout.visibility = View.GONE
             binding.logo.visibility = View.GONE
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        /**
+         * 정상적인 종료시 로그인 정보 삭제
+         */
+        Log.d("종료함0", "ㅂㅂㅂ")
+        if (userID != "비회원") {
+            val api = APIS.create()
+            Shared.prefs.setString("id", "nothing")
+            Shared.prefs.setString("pw", "nothing")
+
+            api.logout(userID).enqueue(object : Callback<PostModel> {
+                override fun onResponse(call: Call<PostModel>, response: Response<PostModel>) {
+                }
+
+                override fun onFailure(call: Call<PostModel>, t: Throwable) {
+                }
+            })
+        }
+    }
+
+    override fun onBackPressed() {
+        if (System.currentTimeMillis() - backWait < 2000) {
+            finishAffinity()
+            exitProcess(0)
+        }
+        backWait = System.currentTimeMillis()
+        Toast.makeText(this, "한번 더 입력시 종료됩니다.", Toast.LENGTH_SHORT).show()
     }
 }

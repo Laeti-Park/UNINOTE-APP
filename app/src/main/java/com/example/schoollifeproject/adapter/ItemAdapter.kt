@@ -95,7 +95,6 @@ class ItemAdapter : TreeViewAdapter<ItemModel>() {
     }
 
     override fun onDrawLine(drawInfo: DrawInfo): BaseLine? {
-        // TODO If you return an BaseLine, line will be draw by the return one instead of TreeViewLayoutManager's
         return null
     }
 

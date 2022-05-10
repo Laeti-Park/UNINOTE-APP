@@ -10,10 +10,14 @@ object MyApp {
     // * 서버에 있는 php 파일 위치
     //  ! 서버 IP 제외
     // ex) /파일명.php
+    const val note_update_url:String = "/php/note/note_update.php"
+    const val delete_info_uri:String = "/php/user/delete_info.php"
+    const val logout_url: String = "/php/user/logout.php"
     const val login_url: String = "/php/user/login.php"
     const val Register_url: String = "/php/user/register.php"
     const val bbs_load_url: String = "/php/note/bbs_load.php"
     const val notice_load_url: String = "/php/note/notice_load.php"
+    const val note_delete_url: String = "/php/note/note_delete.php"
     const val info_load_url: String = "/php/note/info_load.php"
     const val note_write_url: String = "/php/note/note_write.php"
     const val item_save_url: String = "/php/item/item_save.php"

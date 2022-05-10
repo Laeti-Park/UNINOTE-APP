@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.schoollifeproject.R
 import com.example.schoollifeproject.WriteNoticeActivity
@@ -18,6 +19,7 @@ import com.example.schoollifeproject.adapter.InfoFragmentAdapter
 import com.example.schoollifeproject.databinding.FragmentInfoListBinding
 import com.example.schoollifeproject.model.APIS
 import com.example.schoollifeproject.model.InfoListModel
+import com.example.schoollifeproject.model.NoteListContacts
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -28,10 +30,10 @@ import retrofit2.Response
  */
 class InfoListFragment : Fragment() {
     private val TAG = this.javaClass.toString()
-    private var contactsList: MutableList<InfoListModel> = mutableListOf()
+    private var contactsList: MutableList<NoteListContacts> = mutableListOf()
     private val adapter = InfoFragmentAdapter(contactsList)
 
-    private lateinit var getResult: ActivityResultLauncher<Intent>
+    private lateinit var getResult2: ActivityResultLauncher<Intent>
     private lateinit var binding: FragmentInfoListBinding
 
     private val api = APIS.create()
@@ -55,11 +57,16 @@ class InfoListFragment : Fragment() {
         binding = FragmentInfoListBinding.inflate(inflater, container, false)
 
         val dividerItemDecoration = DividerItemDecoration(context, RecyclerView.VERTICAL)
+        val manager = LinearLayoutManager(context)
+        manager.reverseLayout = true
+        manager.stackFromEnd = true
+
+        binding.recyclerView.layoutManager = manager
         binding.recyclerView.addItemDecoration(dividerItemDecoration)
         binding.recyclerView.adapter = adapter
         binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {})
 
-        userID = arguments?.getString("ID").toString()
+        userID = arguments?.getString("userID").toString()
 
         //게시글 목록 호출
         posting()
@@ -67,20 +74,22 @@ class InfoListFragment : Fragment() {
         val addNote = binding.addNote
 
         //비회원 글작성버튼 삭제
-        if (userID == "비회원") addNote.visibility = View.GONE
-        else addNote.visibility = View.VISIBLE
-
-        //글작성 버튼 클릭
         addNote.setOnClickListener {
-            val intent = Intent(context, WriteNoticeActivity::class.java)
-            intent.apply {
-                putExtra("ID", id)
+            if (userID == "비회원") {
+                //TODO:이용불가알람만들기
+                Log.d("비회원글쓰기", "ㅂ")
+            } else {
+                val intent = Intent(context, WriteNoticeActivity::class.java)
+                intent.apply {
+                    putExtra("type", 2)
+                    putExtra("ID", userID)
+                }
+                getResult2.launch(intent)
             }
-            getResult.launch(intent)
         }
 
         //글작성 후 게시글 갱신
-        getResult = registerForActivityResult(
+        getResult2 = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) {
             if (it.resultCode == AppCompatActivity.RESULT_OK) {
@@ -137,9 +146,11 @@ class InfoListFragment : Fragment() {
                 call: Call<List<InfoListModel>>,
                 response: Response<List<InfoListModel>>
             ) {
+                val list = mutableListOf<NoteListContacts>()
                 for (i in response.body()!!) {
                     val contacts = (
-                            InfoListModel(
+                            NoteListContacts(
+                                userID,
                                 i.getStudyKey(),
                                 i.getStudyTitle(),
                                 i.getStudyWriter(),
@@ -148,13 +159,15 @@ class InfoListFragment : Fragment() {
                                 i.getStudyAvailable()
                             )
                             )
-                    contactsList.add(contacts)
-                    adapter.notifyDataSetChanged()
+                    list.add(contacts)
+                    Log.d(TAG,"$list")
                 }
+                contactsList.clear()
+                contactsList.addAll(list)
+                adapter.notifyDataSetChanged()
             }
 
             override fun onFailure(call: Call<List<InfoListModel>>, t: Throwable) {
-
             }
 
         })

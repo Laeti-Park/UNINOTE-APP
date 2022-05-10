@@ -71,5 +71,13 @@
             app:layout_constraintVertical_bias="1.0"
             tools:layout_editor_absoluteX="0dp" />
 
+        <Button
+            android:id="@+id/addNote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="24dp"
+            android:text="글작성"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

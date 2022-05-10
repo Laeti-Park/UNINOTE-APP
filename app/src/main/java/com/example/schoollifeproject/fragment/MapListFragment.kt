@@ -9,10 +9,10 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.example.schoollifeproject.R
-import com.example.schoollifeproject.adapter.MapFragmentAdapter
+import com.example.schoollifeproject.adapter.MapListAdapter
 import com.example.schoollifeproject.databinding.FragmentMapListBinding
 import com.example.schoollifeproject.model.APIS
-import com.example.schoollifeproject.model.MapListModel
+import com.example.schoollifeproject.model.MapModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -23,8 +23,8 @@ import retrofit2.Response
  */
 class MapListFragment : Fragment() {
     private val TAG = this.javaClass.toString()
-    private var mapListList: MutableList<MapListModel> = mutableListOf()
-    private val adapter = MapFragmentAdapter(mapListList)
+    private var mapList: MutableList<MapModel> = mutableListOf()
+    private val adapter = MapListAdapter(mapList)
     private lateinit var binding: FragmentMapListBinding
     private lateinit var userID: String
     val api = APIS.create()
@@ -56,28 +56,28 @@ class MapListFragment : Fragment() {
         //user 아이디
         api.map_list(
             1
-        ).enqueue(object : Callback<List<MapListModel>> {
+        ).enqueue(object : Callback<List<MapModel>> {
             override fun onResponse(
-                call: Call<List<MapListModel>>, response: Response<List<MapListModel>>
+                call: Call<List<MapModel>>, response: Response<List<MapModel>>
             ) {
-                val list = mutableListOf<MapListModel>()
+                val list = mutableListOf<MapModel>()
                 for (i in response.body()!!) {
                     val contacts = (
-                            MapListModel(
+                            MapModel(
                                 i.getMapID(),
                                 i.getMapHits(),
                                 i.getMapRecommend()
                             )
                             )
                     list.add(contacts)
-                    mapListList.add(contacts)
+                    mapList.add(contacts)
                 }
-                mapListList.clear()
-                mapListList.addAll(list)
+                mapList.clear()
+                mapList.addAll(list)
                 adapter.notifyDataSetChanged()
             }
 
-            override fun onFailure(call: Call<List<MapListModel>>, t: Throwable) {
+            override fun onFailure(call: Call<List<MapModel>>, t: Throwable) {
             }
 
         })
@@ -85,7 +85,7 @@ class MapListFragment : Fragment() {
         adapter.setOnMapListener { view, mapID ->
             val mindMapFragment = MindMapFragment()
             val transaction = activity?.supportFragmentManager?.beginTransaction()
-            Log.d("$TAG", "userIDSend: ${userID}, $mapID")
+            Log.d("$TAG", "userIDSend: ${userID}, ${mapID}")
 
             transaction?.replace(R.id.frameLayout, mindMapFragment.newInstance(userID, mapID))
                 ?.commitAllowingStateLoss()
@@ -115,15 +115,6 @@ class MapListFragment : Fragment() {
             Log.d("$TAG", "userIDSend: ${userID}")
 
             transaction?.replace(R.id.frameLayout, mapListFragment.newInstance(userID))
-                ?.commitAllowingStateLoss()
-        }
-
-        binding.infoView.setOnClickListener {
-            val infoListFragment = InfoListFragment()
-            val transaction = activity?.supportFragmentManager?.beginTransaction()
-            Log.d("$TAG", "userIDSend: $userID")
-
-            transaction?.replace(R.id.frameLayout, infoListFragment.newInstance(userID))
                 ?.commitAllowingStateLoss()
         }
 

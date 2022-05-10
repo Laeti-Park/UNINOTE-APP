@@ -14,18 +14,24 @@ import retrofit2.http.*
  * */
 interface APIS {
 
+
+    //로그인 정보 호출
     @Headers(
         "accept: application/json",
         "content-type: application/x-www-form-urlencoded; charset=utf-8"
     )
-    //로그인 정보 호출
     @FormUrlEncoded
     @POST(MyApp.login_url)
     fun login_users(
+        @Field("type") type: Int,
         @Field("ID") userID: String
     ): Call<PostModel>
 
     //회원가입 정보 호출
+    @Headers(
+        "accept: application/json",
+        "content-type: application/x-www-form-urlencoded; charset=utf-8"
+    )
     @FormUrlEncoded
     @POST(MyApp.Register_url)
     fun register_users(
@@ -36,6 +42,10 @@ interface APIS {
     ): Call<PostModel>
 
     //공지사항 호출
+    @Headers(
+        "accept: application/json",
+        "content-type: application/x-www-form-urlencoded; charset=utf-8"
+    )
     @FormUrlEncoded
     @POST(MyApp.notice_load_url)
     fun notice_load(
@@ -43,6 +53,10 @@ interface APIS {
     ): Call<List<NoticeListModel>>
 
     //게시글 호출
+    @Headers(
+        "accept: application/json",
+        "content-type: application/x-www-form-urlencoded; charset=utf-8"
+    )
     @FormUrlEncoded
     @POST(MyApp.bbs_load_url)
     fun bbs_load(
@@ -50,6 +64,10 @@ interface APIS {
     ): Call<List<FreeListModel>>
 
     //공부게시판 호출
+    @Headers(
+        "accept: application/json",
+        "content-type: application/x-www-form-urlencoded; charset=utf-8"
+    )
     @FormUrlEncoded
     @POST(MyApp.info_load_url)
     fun info_load(
@@ -57,15 +75,24 @@ interface APIS {
     ): Call<List<InfoListModel>>
 
     //글작성
+    @Headers(
+        "accept: application/json",
+        "content-type: application/x-www-form-urlencoded; charset=utf-8"
+    )
     @FormUrlEncoded
     @POST(MyApp.note_write_url)
     fun notice_save(
+        @Field("type") type: Int,
         @Field("noticeTitle") noticeTitle: String,
         @Field("userID") userID: String,
         @Field("date") date: String,
         @Field("noticeContents") noticeContents: String
     ): Call<PostModel>
 
+    @Headers(
+        "accept: application/json",
+        "content-type: application/x-www-form-urlencoded; charset=utf-8"
+    )
     @FormUrlEncoded
     @POST(MyApp.item_save_url)
     fun item_save(
@@ -82,18 +109,30 @@ interface APIS {
         @Field("mode") mode: String
     ): Call<PostModel>
 
+    @Headers(
+        "accept: application/json",
+        "content-type: application/x-www-form-urlencoded; charset=utf-8"
+    )
     @FormUrlEncoded
     @POST(MyApp.item_load_url)
     fun item_load(
         @Field("userID") userID: String
     ): Call<List<ItemModel>>
 
+    @Headers(
+        "accept: application/json",
+        "content-type: application/x-www-form-urlencoded; charset=utf-8"
+    )
     @FormUrlEncoded
     @POST(MyApp.map_public_url)
     fun map_public(
         @Field("userID") userID: String
     ): Call<PostModel>
 
+    @Headers(
+        "accept: application/json",
+        "content-type: application/x-www-form-urlencoded; charset=utf-8"
+    )
     @FormUrlEncoded
     @POST(MyApp.map_update_url)
     fun map_update(
@@ -102,12 +141,20 @@ interface APIS {
         @Field("password") password: String
     ): Call<PostModel>
 
+    @Headers(
+        "accept: application/json",
+        "content-type: application/x-www-form-urlencoded; charset=utf-8"
+    )
     @FormUrlEncoded
     @POST(MyApp.map_popular_url)
     fun map_popular(
         @Field("userID") userID: String
     ): Call<PostModel>
 
+    @Headers(
+        "accept: application/json",
+        "content-type: application/x-www-form-urlencoded; charset=utf-8"
+    )
     @FormUrlEncoded
     @POST(MyApp.map_like_url)
     fun map_like(
@@ -115,6 +162,10 @@ interface APIS {
         @Field("mapID") mapID: String
     ): Call<PostModel>
 
+    @Headers(
+        "accept: application/json",
+        "content-type: application/x-www-form-urlencoded; charset=utf-8"
+    )
     @Multipart // @Multipart 사용 시 @Part로 보내줘야 한다.
     @POST(MyApp.item_file_save_url)
     fun item_file_save(
@@ -123,6 +174,10 @@ interface APIS {
         @Part("itemID") itemID: String
     ): Call<String>
 
+    @Headers(
+        "accept: application/json",
+        "content-type: application/x-www-form-urlencoded; charset=utf-8"
+    )
     @FormUrlEncoded
     @POST(MyApp.item_file_load_url)
     fun item_file_load(
@@ -130,16 +185,68 @@ interface APIS {
         @Field("itemID") itemID: String
     ): Call<List<FileModel>>
 
+    @Headers(
+        "accept: application/json",
+        "content-type: application/x-www-form-urlencoded; charset=utf-8"
+    )
+    @FormUrlEncoded
+    @POST(MyApp.note_delete_url)
+    fun note_delete(
+        @Field("type") type: Int,
+        @Field("mapID") mapID: Int
+    ): Call<PostModel>
+
+    @Headers(
+        "accept: application/json",
+        "content-type: application/x-www-form-urlencoded; charset=utf-8"
+    )
+    @FormUrlEncoded
+    @POST(MyApp.logout_url)
+    fun logout(
+        @Field("userID") userID: String
+    ): Call<PostModel>
+
+    @Headers(
+        "accept: application/json",
+        "content-type: application/x-www-form-urlencoded; charset=utf-8"
+    )
     @GET
     fun item_file_down(
         @Url filePath: String
     ): Call<ResponseBody>
 
+    @Headers(
+        "accept: application/json",
+        "content-type: application/x-www-form-urlencoded; charset=utf-8"
+    )
     @FormUrlEncoded
     @POST(MyApp.map_list_url)
     fun map_list(
         @Field("dum") dum: Int
     ): Call<List<MapListModel>>
+
+    @Headers(
+        "accept: application/json",
+        "content-type: application/x-www-form-urlencoded; charset=utf-8"
+    )
+    @FormUrlEncoded
+    @POST(MyApp.delete_info_uri)
+    fun delete_info(
+        @Field("userID") userID: String
+    ): Call<PostModel>
+
+    @Headers(
+        "accept: application/json",
+        "content-type: application/x-www-form-urlencoded; charset=utf-8"
+    )
+    @FormUrlEncoded
+    @POST(MyApp.note_update_url)
+    fun notice_update(
+        @Field("type") type: Int,
+        @Field("key") key: Int,
+        @Field("title") title: String,
+        @Field("contents") contents: String
+    ): Call<PostModel>
 
     companion object { // static 처럼 공유객체로 사용가능함. 모든 인스턴스가 공유하는 객체로서 동작함.
 
