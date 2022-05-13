@@ -30,7 +30,6 @@ public class SmoothLine extends BaseLine {
     public SmoothLine() {
         super();
     }
-
     public SmoothLine(int lineColor, int lineWidth_dp) {
         this();
         this.lineColor = lineColor;

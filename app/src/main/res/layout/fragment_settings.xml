@@ -6,34 +6,34 @@
     android:layout_height="match_parent"
     tools:context=".fragment.SettingsFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-
     <Button
         android:id="@+id/btnLogout"
         style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="140sp"
+        android:layout_width="100sp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="18dp"
         android:fontFamily="@font/title_font1"
         android:gravity="center|left"
         android:text="로그아웃"
+        android:textColor="#464646"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/settingView" />
+
     <Button
         android:id="@+id/btnDeleteInfo"
         style="@style/Widget.AppCompat.Button.Borderless"
-        android:layout_width="140sp"
+        android:layout_width="70sp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:fontFamily="@font/title_font1"
-        android:gravity="center|left"
+        android:gravity="center|right"
         android:text="회원탈퇴"
-        app:layout_goneMarginTop="20sp"
-        android:textSize="20sp"
-        app:layout_constraintTop_toBottomOf="@+id/btnLogout"
+        android:textColor="#787878"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        />
+        app:layout_goneMarginTop="20sp" />
+
     <TextView
         android:id="@+id/settingView"
         android:layout_width="wrap_content"
@@ -55,20 +55,23 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="30dp"
         android:fontFamily="@font/title_font2"
-        android:text="로그인 정보"
+        android:text="로그인 정보:"
+        android:textColor="#000000"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/settingView" />
 
     <TextView
         android:id="@+id/loginInfo"
-        android:layout_width="120sp"
+        android:layout_width="160sp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="30dp"
+        android:layout_marginEnd="10dp"
         android:fontFamily="@font/title_font1"
         android:textSize="20sp"
-        app:layout_constraintLeft_toRightOf="@+id/log"
-        app:layout_constraintRight_toLeftOf="@+id/btnLogout"
+        app:layout_constraintEnd_toStartOf="@+id/btnLogout"
+        app:layout_constraintStart_toEndOf="@+id/log"
         app:layout_constraintTop_toBottomOf="@+id/settingView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,8 +1,9 @@
 package com.example.schoollifeproject.model
 
-import com.google.gson.annotations.Expose
-import com.google.gson.annotations.SerializedName
-
+/**
+ * 게시글 정보를 저장하기 위한 Model
+ * 작성자 : 이준영
+ */
 class NoteListContacts(
     var loginID: String,
     var noteID: Int,
@@ -11,5 +12,4 @@ class NoteListContacts(
     var noteDate: String,
     var noteContent: String,
     var noteAvailable: Int
-) {
-}
+)

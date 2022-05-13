@@ -7,9 +7,6 @@ package com.example.schoollifeproject.model
 object MyApp {
     const val TAG: String = "로그"
 
-    // * 서버에 있는 php 파일 위치
-    //  ! 서버 IP 제외
-    // ex) /파일명.php
     const val note_update_url:String = "/php/note/note_update.php"
     const val delete_info_uri:String = "/php/user/delete_info.php"
     const val logout_url: String = "/php/user/logout.php"
@@ -26,8 +23,8 @@ object MyApp {
     const val map_update_url: String = "/php/map/map_update.php"
     const val map_popular_url: String = "/php/map/map_popular.php"
     const val map_like_url: String = "/php/map/map_like.php"
+    const val map_list_url: String = "/php/map/map_list.php"
     const val item_file_save_url: String = "/php/item/item_file_save.php"
     const val item_file_load_url: String = "/php/item/item_file_load.php"
     const val item_file_del_url: String = "/php/item/item_file_del.php"
-    const val map_list_url: String = "/php/map/map_list.php"
 }

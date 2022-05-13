@@ -1,13 +1,16 @@
 package com.example.schoollifeproject.adapter
 
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.schoollifeproject.databinding.ContactsNoticeReadBinding
 import com.example.schoollifeproject.model.NoteReadContacts
+
 /**
  * 게시글 RecyclerView Adapter
- * */
+ * 작성자 : 이준영
+ **/
 class NoteReadListAdapter(private val itemList: List<NoteReadContacts>) :
     RecyclerView.Adapter<NoteReadListAdapter.NoteReadViewHolder>() {
     override fun getItemCount(): Int {
@@ -27,7 +30,6 @@ class NoteReadListAdapter(private val itemList: List<NoteReadContacts>) :
         }
     }
 
-
     class NoteReadViewHolder(private val binding: ContactsNoticeReadBinding) :
         RecyclerView.ViewHolder(binding.root) {
         //게시글에 등록될 Text
@@ -35,7 +37,8 @@ class NoteReadListAdapter(private val itemList: List<NoteReadContacts>) :
             binding.title.text = item.title
             binding.date.text = item.date
             binding.writer.text = item.writer
-            binding.content.text = item.contents
+            binding.content.text = Html.fromHtml(item.contents).toString()
+
         }
     }
 }

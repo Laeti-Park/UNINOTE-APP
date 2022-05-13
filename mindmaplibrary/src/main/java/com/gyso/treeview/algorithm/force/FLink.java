@@ -1,9 +1,5 @@
 package com.gyso.treeview.algorithm.force;
 
-/**
- * Created by Z.Pan on 2016/10/9.
- */
-
 public class FLink {
 
     FNode source;

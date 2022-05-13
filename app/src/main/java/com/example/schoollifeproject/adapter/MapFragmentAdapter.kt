@@ -8,7 +8,7 @@ import com.example.schoollifeproject.databinding.ContactsListItemBinding
 import com.example.schoollifeproject.model.MapListModel
 
 /**
- * 메인메뉴 추천맵 RecyclerView Adapter
+ * 추천 로드맵 Fragment RecyclerView Adapter
  * 작성자 : 박동훈
  * */
 class MapFragmentAdapter(private val itemList: MutableList<MapListModel>) :

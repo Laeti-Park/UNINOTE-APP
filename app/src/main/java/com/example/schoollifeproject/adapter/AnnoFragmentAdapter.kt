@@ -10,7 +10,7 @@ import com.example.schoollifeproject.NoticeActivity
 import com.example.schoollifeproject.model.NoteListContacts
 
 /**
- * 메인메뉴 공지 RecyclerView Adapter
+ * 공지게시판 프래그먼트 RecyclerView Adapter
  * 작성자 : 박동훈
  * */
 class AnnoFragmentAdapter(private val itemList: List<NoteListContacts>) :

@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Stack;
 
 /**
- *  guaishouN 674149099@qq.com
- *
  *  Note:
  *  You should override {@link #hashCode()}{@link #equals(Object)} methods for collections operations in NodeModel,
  *  so that it works well because some methods of this class are using {@link java.util.Collection#contains(Object)} and so on.
@@ -23,14 +21,6 @@ public class NodeModel<T> implements Serializable {
      * for mark this node
      */
     public boolean mark = false;
-    public void mark(){
-        mark = true;
-    }
-    public boolean isMarkThenReset(){
-        boolean b = mark;
-        mark = false;
-        return b;
-    }
 
     /**
      * the parent node,if root node parent node=null;
@@ -172,6 +162,7 @@ public class NodeModel<T> implements Serializable {
             stack.addAll(childNodes);
         }
     }
+
     /**
      * traverse all sub node include self
      * @param next callback

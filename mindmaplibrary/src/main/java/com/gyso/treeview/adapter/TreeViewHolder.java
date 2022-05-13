@@ -7,11 +7,6 @@ import androidx.annotation.NonNull;
 import com.gyso.treeview.model.NodeModel;
 
 /**
- * @Author: 怪兽N
- * @Time: 2021/4/23  15:20
- * @Email: 674149099@qq.com
- * @WeChat: guaishouN
- * @Describe:
  * View holder
  */
 public class TreeViewHolder<T> {

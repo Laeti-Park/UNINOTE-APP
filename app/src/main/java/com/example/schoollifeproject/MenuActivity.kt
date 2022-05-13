@@ -1,11 +1,8 @@
 package com.example.schoollifeproject
 
 import android.content.DialogInterface
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -27,11 +24,9 @@ import retrofit2.Response
 import kotlin.system.exitProcess
 
 /**
- * 로그인 후 메뉴 Activity
+ * MenuActivity
  * 작성자 : 이준영, 박동훈
  */
-
-// TODO : menu-자유게시판, contacts_main_board.xml, Fragment-공지사항/공부게시판, 디자인
 class MenuActivity : AppCompatActivity() {
     private val annoContactsList: MutableList<NoticeListModel> = mutableListOf()
     private val mapContactsList: MutableList<MapListModel> = mutableListOf()
@@ -357,7 +352,6 @@ class MenuActivity : AppCompatActivity() {
         /**
          * 정상적인 종료시 로그인 정보 삭제
          */
-        Log.d("종료함0", "ㅂㅂㅂ")
         if (userID != "비회원") {
             val api = APIS.create()
             Shared.prefs.setString("id", "nothing")
@@ -374,7 +368,7 @@ class MenuActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (System.currentTimeMillis() - backWait < 2000) {
+        if (System.currentTimeMillis() - backWait < 1000) {
             finishAffinity()
             exitProcess(0)
         }

@@ -15,13 +15,16 @@
             android:layout_height="match_parent"
             android:fontFamily="@font/title_font1"
             android:paddingTop="6sp"
-            android:text="•" />
+            android:text="•"
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fontFamily="@font/title_font1"
-            android:padding="6sp" />
+            android:maxLines="2"
+            android:padding="6sp"
+            android:textSize="12sp" />
     </LinearLayout>
 </layout>

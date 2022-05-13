@@ -2,6 +2,7 @@ package com.example.schoollifeproject.adapter
 
 import android.graphics.Color
 import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +18,10 @@ import com.gyso.treeview.line.BaseLine
 import com.gyso.treeview.line.DashLine
 import com.gyso.treeview.model.NodeModel
 
-
+/**
+ * 로드맵(마인드맵) Item View Adapter
+ * 작성자 : 박동훈
+ */
 class ItemAdapter : TreeViewAdapter<ItemModel>() {
     private val dashLine = DashLine(Color.parseColor("#F06292"), 6)
     private lateinit var listener: OnItemClickListener
@@ -66,32 +70,32 @@ class ItemAdapter : TreeViewAdapter<ItemModel>() {
         var i = 0
         contentView.text = item.getContent()
 
-            nodeBack.setOnClickListener { v ->
-                i++
-                val handler = Handler()
-                val r = Runnable { i = 0 }
+        nodeBack.setOnClickListener { v ->
+            i++
+            val handler = Handler(Looper.getMainLooper())
+            val r = Runnable { i = 0 }
 
-                if (i == 1) {
-                    handler.postDelayed(r, 250);
-                    if (mapEditable) {
-                        listener.onItemClick(v, node)
-                    }
-                } else if (i == 2) {
-                    i = 0;
-                    if (mapEditable) {
-                        doubleClicklistener.onItemDoubleClick(v, node, true)
-                    } else {
-                        doubleClicklistener.onItemDoubleClick(v, node, false)
-                    }
+            if (i == 1) {
+                handler.postDelayed(r, 250);
+                if (mapEditable) {
+                    listener.onItemClick(v, node)
+                }
+            } else if (i == 2) {
+                i = 0;
+                if (mapEditable) {
+                    doubleClicklistener.onItemDoubleClick(v, node, true)
+                } else {
+                    doubleClicklistener.onItemDoubleClick(v, node, false)
                 }
             }
+        }
 
-            nodeBack.setOnLongClickListener { v ->
-                if(mapEditable) {
-                    longClickListener.onItemLongClick(v, node)
-                }
-                true
+        nodeBack.setOnLongClickListener { v ->
+            if (mapEditable) {
+                longClickListener.onItemLongClick(v, node)
             }
+            true
+        }
     }
 
     override fun onDrawLine(drawInfo: DrawInfo): BaseLine? {

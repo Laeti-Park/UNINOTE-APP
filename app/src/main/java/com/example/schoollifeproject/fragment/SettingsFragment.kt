@@ -18,6 +18,10 @@ import retrofit2.Call
 import retrofit2.Response
 import javax.security.auth.callback.Callback
 
+/**
+ * 설정 Fragment
+ * 작성자 : 박동훈
+ */
 class SettingsFragment : Fragment() {
 
     private lateinit var userID: String
@@ -74,7 +78,6 @@ class SettingsFragment : Fragment() {
 
         dialog.setTitle("회원탈퇴")
         dialog.setMessage("정말 탈퇴하시겠습니까?")
-
 
         val dialog_listener = DialogInterface.OnClickListener { _, which ->
             when (which) {

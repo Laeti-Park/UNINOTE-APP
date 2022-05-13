@@ -3,6 +3,10 @@ package com.example.schoollifeproject.model
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
+/**
+ * JSON Type로 온 아이템 정보를 저장하기 위한 Model
+ * 작성자 : 박동훈
+ */
 class ItemModel(
     @Expose
     @SerializedName("itemID")

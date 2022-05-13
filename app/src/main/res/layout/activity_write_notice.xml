@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:padding="10sp"
         tools:context=".WriteNoticeActivity">
 
         <EditText
             android:id="@+id/editTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:ems="18"
+            android:fontFamily="@font/title_font1"
             android:hint="제목"
+            android:maxLines="1"
+            android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -21,16 +26,23 @@
         <EditText
             android:id="@+id/editNotice"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:ems="18"
+            android:fontFamily="@font/title_font1"
+            android:gravity="top"
             android:hint="내용"
             android:maxLength="18"
             android:maxLines="18"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/editTitle" />
 
         <LinearLayout
+            android:id="@+id/linearLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -42,14 +54,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="10sp"
-                android:text="저장" />
+                android:background="@drawable/bg_button"
+                android:fontFamily="@font/title_font1"
+                android:text="저장"
+                android:textSize="20sp" />
 
             <Button
                 android:id="@+id/btnCancel"
-                android:layout_marginLeft="10sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="취소" />
+                android:layout_marginLeft="10sp"
+                android:background="@drawable/bg_button"
+                android:fontFamily="@font/title_font1"
+                android:text="취소"
+                android:textSize="20sp" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

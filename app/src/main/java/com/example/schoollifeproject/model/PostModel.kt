@@ -2,11 +2,11 @@ package com.example.schoollifeproject.model
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-import java.io.File
 
 /**
  * 서버에서 return된 값이 저장되는 DATA 클래스
- * */
+ * 작성자 : 이준영, 박동훈
+ **/
 data class PostModel(
     @Expose
     @SerializedName("type")

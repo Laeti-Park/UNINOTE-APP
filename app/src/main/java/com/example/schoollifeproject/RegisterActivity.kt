@@ -1,14 +1,13 @@
 package com.example.schoollifeproject
 
 import android.content.DialogInterface
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import com.example.schoollifeproject.databinding.ActivityRegisterBinding
 import com.example.schoollifeproject.model.APIS
 import com.example.schoollifeproject.model.PostModel
-import com.example.schoollifeproject.shared.Shared
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -17,7 +16,6 @@ import retrofit2.Response
  * 회원가입 실행 Activity
  * 작성자 : 이준영
  */
-
 class RegisterActivity : AppCompatActivity() {
     var isExistBlank = false
     var isPWSame = false
@@ -91,7 +89,7 @@ class RegisterActivity : AppCompatActivity() {
         } else if (type == "success") {
             dialog.setTitle("회원가입 성공")
             dialog.setMessage("환영합니다.")
-        }else if (type == "nothing") {
+        } else if (type == "nothing") {
             dialog.setTitle("회원가입 실패")
             dialog.setMessage("사용할 수 없는 아이디입니다.")
         }
@@ -101,7 +99,6 @@ class RegisterActivity : AppCompatActivity() {
                 finish()
             }
         }
-
         dialog.setPositiveButton("확인", dialog_litener)
         dialog.show()
     }

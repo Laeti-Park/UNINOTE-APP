@@ -8,8 +8,8 @@ import com.example.schoollifeproject.databinding.ContactsMainBoardBinding
 import com.example.schoollifeproject.model.MapListModel
 
 /**
- * 메인메뉴 추천맵 RecyclerView Adapter
- * 작성자 : 이준영, 박동훈
+ * 추천 로드맵 MenuActivity RecyclerView Adapter
+ * 작성자 : 박동훈, 이준영
  * */
 class MapListAdapter(private val itemList: List<MapListModel>) :
     RecyclerView.Adapter<MapListAdapter.SugViewHolder>() {

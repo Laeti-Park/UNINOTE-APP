@@ -31,12 +31,7 @@ public abstract class TreeLayoutManager {
     public static final String TAG = TreeLayoutManager.class.getSimpleName();
     public static final int LAYOUT_TYPE_HORIZON_RIGHT = 0;
     public static final int LAYOUT_TYPE_VERTICAL_DOWN = 1;
-    public static final int LAYOUT_TYPE_FORCE_DIRECTED = 2;
-    public static final int LAYOUT_TYPE_HORIZON_LEFT = 3;
-    public static final int LAYOUT_TYPE_VERTICAL_UP = 4;
-    public static final int LAYOUT_TYPE_RING = 5;
     public static final int LAYOUT_TYPE_HORIZON_LEFT_AND_RIGHT = 6;
-    public static final int LAYOUT_TYPE_VERTICAL_DOWN_AND_UP = 7;
 
     /**
      * the content padding, unit is dp;
@@ -113,16 +108,8 @@ public abstract class TreeLayoutManager {
         return spaceParentToChild;
     }
 
-    public void setSpaceParentToChild(int spaceParentToChild) {
-        this.spaceParentToChild = spaceParentToChild;
-    }
-
     public int getSpacePeerToPeer() {
         return spacePeerToPeer;
-    }
-
-    public void setSpacePeerToPeer(int spacePeerToPeer) {
-        this.spacePeerToPeer = spacePeerToPeer;
     }
 
     public void setViewport(int winHeight, int winWidth) {
@@ -171,7 +158,7 @@ public abstract class TreeLayoutManager {
         if (targetNodeTag instanceof NodeModel) {
             currentNodeView.setTag(R.id.node_final_location, finalLocation);
             Log.d("Debug_Log", "TreeLayoutManager/LayoutAnimatePrepare: " +
-                    finalLocation.top + " and " + finalLocation.left);
+                    finalLocation.top + " and " + finalLocation.left+" " +targetNodeTag);
             if (targetNodeTag.equals(currentNode)) {
                 TreeViewLog.e(TAG, "Get target location!");
                 treeViewContainer.setTag(R.id.target_node_final_location, finalLocation);
@@ -400,22 +387,9 @@ public abstract class TreeLayoutManager {
         return false;
     }
 
-    public void onManagerMeasureNode(NodeModel<?> currentNode,View currentNodeView,ViewBox finalLocation,TreeViewContainer treeViewContainer){}
-
     public void onManagerFinishMeasureAllNodes(TreeViewContainer treeViewContainer){}
 
     public void onManagerLayoutNode(NodeModel<?> currentNode,View currentNodeView,ViewBox finalLocation,TreeViewContainer treeViewContainer){}
 
     public void onManagerFinishLayoutAllNodes(TreeViewContainer treeViewContainer){}
-
-
-    public interface  LayoutListener{
-        default void onLayoutChild(NodeModel<?> next){};
-        void onLayoutFinished();
-    }
-
-    public interface  MeasureListener{
-        default void onMeasureChild(NodeModel<?> next){};
-        void onMeasureFinished();
-    }
 }

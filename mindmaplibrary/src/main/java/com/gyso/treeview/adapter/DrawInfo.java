@@ -5,11 +5,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 
 /**
- * @Author: 怪兽N
- * @Time: 2021/5/7  21:15
- * @Email: 674149099@qq.com
- * @WeChat: guaishouN
- * @Describe:
  * In order to draw a custom line, there are too many draw info should be passed.
  * So, this class is estimated to package the draw element that need to draw a colorful line between two nodes.
  */

@@ -10,8 +10,8 @@ import com.example.schoollifeproject.NoticeActivity
 import com.example.schoollifeproject.model.NoteListContacts
 
 /**
- * 자유 게시판 RecyclerView Adapter
- * 작성자 : 이준영
+ * 자유게시판 Fragment RecyclerView Adapter
+ * 작성자 : 이준영, 박동훈
  * */
 class FreeFragmentAdapter(private val itemList: MutableList<NoteListContacts>) :
     RecyclerView.Adapter<FreeFragmentAdapter.ContactsViewHolder>() {

@@ -1,25 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <LinearLayout
         android:id="@+id/rootView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
+        android:layout_width="340sp"
+        android:layout_height="50sp"
+        android:gravity="center|left"
         android:orientation="horizontal"
-        android:padding="20sp">
+        android:paddingStart="4sp"
+        android:paddingTop="4sp"
+        android:paddingEnd="4sp"
+        android:paddingBottom="4sp">
 
         <ImageView
             android:id="@+id/fileTypeImage"
-            android:layout_width="40sp"
-            android:layout_height="40sp" />
+            android:layout_width="20sp"
+            android:layout_height="20sp"
+            android:layout_marginLeft="10sp" />
 
         <TextView
             android:id="@+id/fileNameText"
-            android:layout_width="240sp"
+            android:layout_width="160sp"
             android:layout_height="40sp"
-            android:layout_marginLeft="20sp"
-            android:layout_marginRight="20sp" />
+            android:layout_marginLeft="10sp"
+            android:layout_marginRight="20sp"
+            android:fontFamily="@font/title_font1"
+            android:gravity="center|left"
+            android:maxLines="2"
+            android:textSize="12sp" />
+
+        <ImageButton
+            android:id="@+id/fileDownloadButton"
+            android:layout_width="40sp"
+            android:layout_height="40sp"
+            android:background="@drawable/bg_button"
+            android:cropToPadding="true"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:visibility="visible"
+            app:srcCompat="@drawable/ic_item_file_down" />
+
+        <ImageButton
+            android:id="@+id/fileDeleteButton"
+            android:layout_width="40sp"
+            android:layout_height="40sp"
+            android:layout_marginLeft="15sp"
+            android:background="@drawable/bg_button"
+            android:cropToPadding="true"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:visibility="visible"
+            app:srcCompat="@drawable/ic_item_file_del" />
 
     </LinearLayout>
 </layout>

@@ -4,7 +4,8 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 /**
- * 공지사항을 JSON파일 타입으로 호출하기위한 Class
+ * JSON Type로 온 공지사항 게시글 정보를 저장하기 위한 Model
+ * 작성자 : 이준영
  * */
 class NoticeListModel(
     @Expose

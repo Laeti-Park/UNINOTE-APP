@@ -79,7 +79,6 @@ class AnnoListFragment : Fragment() {
         //글작성 버튼 클릭
         addNote.setOnClickListener {
             if (userID == "비회원") {
-                //TODO:이용불가알람만들기
             } else {
                 val intent = Intent(context, WriteNoticeActivity::class.java)
                 intent.apply {

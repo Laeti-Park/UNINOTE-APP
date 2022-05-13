@@ -15,14 +15,6 @@ import com.gyso.treeview.layout.TreeLayoutManager;
 import com.gyso.treeview.model.NodeModel;
 import com.gyso.treeview.util.DensityUtils;
 
-/**
- * @Author: 怪兽N
- * @Time: 2021/5/8  9:40
- * @Email: 674149099@qq.com
- * @WeChat: guaishouN
- * @Describe:
- * Straight Line
- */
 public class StraightLine extends BaseLine {
     public static final int DEFAULT_LINE_WIDTH_DP = 3;
     private int lineColor = Color.parseColor("#055287");

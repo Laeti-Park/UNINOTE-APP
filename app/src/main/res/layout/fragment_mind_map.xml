@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
 
     <com.gyso.treeview.GysoTreeView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#F9F9F9"/>
+        android:background="#F9F9F9" />
 
     <TextView
         android:id="@+id/scale_percent"
@@ -26,21 +25,23 @@
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="100%"/>
+        tools:text="100%" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:minHeight="50sp"
-        app:itemIconSize="22sp"
-        app:itemBackground="@color/uninote2"
-        app:itemIconTint="@color/black"
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:labelVisibilityMode="unlabeled"
+        android:background="@color/uninote2"
+        android:foregroundGravity="left"
+        android:minHeight="50sp"
         android:visibility="invisible"
+        app:itemBackground="@color/uninote2"
+        app:itemIconSize="22sp"
+        app:itemIconTint="@color/black"
+        app:labelVisibilityMode="unlabeled"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/map_bottom_menu" />
 
     <ImageButton
@@ -140,5 +141,16 @@
             android:visibility="gone" />
 
     </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/loadingPanel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center" >
 
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone" />
+    </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

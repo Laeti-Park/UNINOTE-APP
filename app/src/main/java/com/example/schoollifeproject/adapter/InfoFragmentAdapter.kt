@@ -5,12 +5,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.example.schoollifeproject.databinding.ContactsListItemBinding
 import com.example.schoollifeproject.NoticeActivity
+import com.example.schoollifeproject.databinding.ContactsListItemBinding
 import com.example.schoollifeproject.model.NoteListContacts
 
 /**
- * 공부게시판 RecyclerView Adapter
+ * 공부게시판 Fragment RecyclerView Adapter
  * 작성자 : 박동훈
  * */
 class InfoFragmentAdapter(private val itemList: List<NoteListContacts>) :
