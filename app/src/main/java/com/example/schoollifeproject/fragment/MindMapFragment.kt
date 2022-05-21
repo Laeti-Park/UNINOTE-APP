@@ -589,6 +589,8 @@ class MindMapFragment : Fragment() {
                             response: Response<PostModel>
                         ) {
                             Log.d("$TAG", "item_file_del: 리스폰 성공 ${response.body()!!.error}")
+                            filePopupWindow.dismiss()
+                            saveFileDB(targetItem, editor, adapter.mapEditable)
                         }
 
                         override fun onFailure(call: Call<PostModel>, t: Throwable) {
