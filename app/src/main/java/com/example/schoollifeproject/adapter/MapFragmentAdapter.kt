@@ -14,7 +14,6 @@ import com.example.schoollifeproject.model.MapListModel
 class MapFragmentAdapter(private val itemList: MutableList<MapListModel>) :
     RecyclerView.Adapter<MapFragmentAdapter.ContactsMapViewHolder>() {
 
-    private val TAG = this.javaClass.toString()
     private lateinit var mapListener: OnMapClickListener
 
     fun setOnMapListener(mapListener: (View, String) -> Unit) {

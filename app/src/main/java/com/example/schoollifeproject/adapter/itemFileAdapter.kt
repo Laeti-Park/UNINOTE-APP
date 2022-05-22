@@ -16,7 +16,6 @@ import com.example.schoollifeproject.model.FileModel
 class ItemFileAdapter(private val itemList: MutableList<FileModel>) :
     RecyclerView.Adapter<ItemFileAdapter.ItemFileViewHolder>() {
 
-    private val TAG = this.javaClass.toString()
     private lateinit var fileListener: OnFileClickListener
     private lateinit var fileDelListener: OnFileDelClickListener
     var mapEditable = true

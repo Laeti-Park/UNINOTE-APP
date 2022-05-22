@@ -1,7 +1,6 @@
 package com.example.schoollifeproject.fragment
 
 import android.app.Activity.RESULT_OK
-import android.app.DownloadManager
 import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Color
@@ -11,7 +10,6 @@ import android.provider.OpenableColumns
 import android.util.Log
 import android.view.*
 import android.widget.*
-import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
@@ -53,7 +51,7 @@ import java.io.*
  * 작성자 : 박동훈
  */
 class MindMapFragment : Fragment() {
-    private val TAG = this.javaClass.toString()
+    private val classTag = this.javaClass.toString()
     private val api = APIS.create()
     val adapter: ItemAdapter = ItemAdapter()
 
@@ -73,8 +71,7 @@ class MindMapFragment : Fragment() {
     private lateinit var resultLauncher: ActivityResultLauncher<Intent>
     private lateinit var targetItem: NodeModel<ItemModel>
     private lateinit var targetItemID: String
-    private var downloadId: Long = -1L
-    private lateinit var downloadManager: DownloadManager
+    private lateinit var parentItemID: String
 
     private lateinit var warnPopupView: View
     private lateinit var warnPopupWindow: PopupWindow
@@ -102,13 +99,13 @@ class MindMapFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         super.onCreate(savedInstanceState)
         binding = FragmentMindMapBinding.inflate(inflater, container, false)
 
-        userID = arguments?.getString("userID").toString() // menuActivity를 통해 받은 userID
-        mapID = arguments?.getString("mapID").toString() // menuActivity를 통해 받은 userID
-        Log.d("$TAG", "userID: ${userID}, ${mapID}")
+        userID = arguments?.getString("userID").toString() // menuActivity 통해 받은 userID
+        mapID = arguments?.getString("mapID").toString() // menuActivity 통해 받은 userID
+        Log.d(classTag, "userID: $userID, $mapID")
 
         if (userID != mapID) {
             adapter.mapEditable = false
@@ -123,30 +120,32 @@ class MindMapFragment : Fragment() {
          * filePopupWindow : 아이템 파일 설정
          * publicPopupWindow : 공개/비공개 관련 설정
          */
-        itemPopupView = LayoutInflater.from(context!!).inflate(R.layout.window_item_set, null)
-        warnPopupView = LayoutInflater.from(context!!).inflate(R.layout.window_warning, null)
-        filePopupView = LayoutInflater.from(context!!).inflate(R.layout.window_item_file, null)
+        itemPopupView =
+            LayoutInflater.from(requireContext()).inflate(R.layout.window_item_set, null)
+        warnPopupView = LayoutInflater.from(requireContext()).inflate(R.layout.window_warning, null)
+        filePopupView =
+            LayoutInflater.from(requireContext()).inflate(R.layout.window_item_file, null)
         publicPopupView =
-            LayoutInflater.from(context!!).inflate(R.layout.window_map_public_set, null)
+            LayoutInflater.from(requireContext()).inflate(R.layout.window_map_public_set, null)
 
         itemPopupWindow = PopupWindow(
             itemPopupView,
-            ((context!!.resources.displayMetrics.widthPixels) * 0.9).toInt(),
+            ((requireContext().resources.displayMetrics.widthPixels) * 0.9).toInt(),
             WindowManager.LayoutParams.WRAP_CONTENT
         )
         warnPopupWindow = PopupWindow(
             warnPopupView,
-            ((context!!.resources.displayMetrics.widthPixels) * 0.7).toInt(),
+            ((requireContext().resources.displayMetrics.widthPixels) * 0.7).toInt(),
             WindowManager.LayoutParams.WRAP_CONTENT
         )
         filePopupWindow = PopupWindow(
             filePopupView,
-            ((context!!.resources.displayMetrics.widthPixels) * 0.9).toInt(),
+            ((requireContext().resources.displayMetrics.widthPixels) * 0.9).toInt(),
             WindowManager.LayoutParams.WRAP_CONTENT
         )
         publicPopupWindow = PopupWindow(
             publicPopupView,
-            ((context!!.resources.displayMetrics.widthPixels) * 0.7).toInt(),
+            ((requireContext().resources.displayMetrics.widthPixels) * 0.7).toInt(),
             WindowManager.LayoutParams.WRAP_CONTENT
         )
 
@@ -168,7 +167,7 @@ class MindMapFragment : Fragment() {
         api.map_public(mapID).enqueue(object : Callback<PostModel> {
             override fun onResponse(call: Call<PostModel>, response: Response<PostModel>) {
                 Log.d(
-                    "$TAG",
+                    classTag,
                     "map_public: 리스폰 성공 ${response.body()?.error.toString()}, ${adapter.mapEditable}"
                 )
                 if (response.body()?.error.toString() == "failed") {
@@ -190,7 +189,7 @@ class MindMapFragment : Fragment() {
             }
 
             override fun onFailure(call: Call<PostModel>, t: Throwable) {
-                Log.d("$TAG", "map_public: 리스폰 실패 : $t")
+                Log.d(classTag, "map_public: 리스폰 실패 : $t")
             }
         })
     }
@@ -246,48 +245,48 @@ class MindMapFragment : Fragment() {
                 if (response.body() != null) {
 
                     for (i in response.body()!!) {
-                        Log.d("$TAG", "item_load/itemID: ${i.getItemID()}")
+                        Log.d(classTag, "item_load/itemID: ${i.getItemID()}")
                         i.setPosition(i.getItemID()[i.getItemID().length - 1].toString() == "L")
                         val last = if (i.getPosition()) "L" else "R"
-                        val item = NodeModel<ItemModel>(i)
-                        val childID = i.getItemID().split("_")[1].split("$last")[0]
+                        val item = NodeModel(i)
+                        val childID = i.getItemID().split("_")[1].split(last)[0]
                         mapItems[childID] = item
                     }
 
                     for (i in response.body()!!) {
                         val parentID = i.getItemID().split("_")[0]
                         val last = if (i.getPosition()) "L" else "R"
-                        val childID = i.getItemID().split("_")[1].split("$last")[0]
-                        Log.d("$TAG", "item_load/nodesInfo: ${parentID}, ${childID}")
+                        val childID = i.getItemID().split("_")[1].split(last)[0]
+                        Log.d(classTag, "item_load/nodesInfo: $parentID, $childID")
 
                         when (parentID) {
                             "grade1" -> {
-                                editor.addChildNodes(grade1, mapItems.get(childID))
+                                editor.addChildNodes(grade1, mapItems[childID])
                             }
                             "grade2" -> {
-                                editor.addChildNodes(grade2, mapItems.get(childID))
+                                editor.addChildNodes(grade2, mapItems[childID])
                             }
                             "grade3" -> {
-                                editor.addChildNodes(grade3, mapItems.get(childID))
+                                editor.addChildNodes(grade3, mapItems[childID])
                             }
                             "grade4" -> {
-                                editor.addChildNodes(grade4, mapItems.get(childID))
+                                editor.addChildNodes(grade4, mapItems[childID])
                             }
                             else -> {
-                                editor.addChildNodes(mapItems.get(parentID), mapItems.get(childID))
+                                editor.addChildNodes(mapItems[parentID], mapItems[childID])
                             }
                         }
                         itemMaxNum =
                             (if (i.getNum() != null) i.getNum()!! else throw NullPointerException("Expression 'i.getNum()' must not be null"))
                         itemMaxNum++
-                        Log.d("$TAG", "item_load/itemMaxNum: ${itemMaxNum}")
+                        Log.d(classTag, "item_load/itemMaxNum: $itemMaxNum")
                     }
                     editor.focusMidLocation()
                 }
             }
 
             override fun onFailure(call: Call<List<ItemModel>>, t: Throwable) {
-                Log.d("$TAG", "item_load: 리스폰 실패 : $t")
+                Log.d(classTag, "item_load: 리스폰 실패 : $t")
             }
         })
 
@@ -297,7 +296,7 @@ class MindMapFragment : Fragment() {
         api.map_popular(mapID).enqueue(object : Callback<PostModel> {
             override fun onResponse(call: Call<PostModel>, response: Response<PostModel>) {
                 Log.d(
-                    "$TAG",
+                    classTag,
                     "map_popular: 리스폰 성공 ${response.body()?.error.toString()}"
                 )
                 if (response.body()?.error.toString() == "ok") {
@@ -316,7 +315,7 @@ class MindMapFragment : Fragment() {
             }
 
             override fun onFailure(call: Call<PostModel>, t: Throwable) {
-                Log.d("$TAG", "map_popular: 리스폰 실패 : $t")
+                Log.d(classTag, "map_popular: 리스폰 실패 : $t")
             }
         })
         handler.postDelayed({
@@ -340,17 +339,16 @@ class MindMapFragment : Fragment() {
         var itemHeight = "50px"
         val itemNote = item.value.getNote()
 
-        if (view != null) {
-            view.addOnLayoutChangeListener { _, i, i2, i3, i4, _, _, _, _ ->
-                itemWidth = "${i3 - i}px"
-                itemHeight = "${i4 - i2}px"
-            }
+        view?.addOnLayoutChangeListener { _, i, i2, i3, i4, _, _, _, _ ->
+            itemWidth = "${i3 - i}px"
+            itemHeight = "${i4 - i2}px"
         }
-        Log.d("$TAG", "item_save: $mode")
+        Log.d(classTag, "item_save: $mode")
         if (itemCount != null) {
             api.item_save(
                 itemID,
                 targetItemID,
+                parentItemID,
                 itemTop,
                 itemLeft,
                 userID,
@@ -362,18 +360,22 @@ class MindMapFragment : Fragment() {
                 mode
             ).enqueue(object : Callback<PostModel> {
                 override fun onResponse(call: Call<PostModel>, response: Response<PostModel>) {
-                    Log.d("$TAG", "item_save: 리스폰 성공 $mode")
-                    if (response.body()?.error.toString() == "insert") {
-                        Log.d("$TAG", "item_save: 삽입 완료")
-                    } else if (response.body()?.error.toString() == "update") {
-                        Log.d("$TAG", "item_save: 변경 완료")
-                    } else if (response.body()?.error.toString() == "delete") {
-                        Log.d("$TAG", "item_save: 삭제 완료")
+                    Log.d(classTag, "item_save: 리스폰 성공 $mode")
+                    when {
+                        response.body()?.error.toString() == "insert" -> {
+                            Log.d(classTag, "item_save: 삽입 완료")
+                        }
+                        response.body()?.error.toString() == "update" -> {
+                            Log.d(classTag, "item_save: 변경 완료")
+                        }
+                        response.body()?.error.toString() == "delete" -> {
+                            Log.d(classTag, "item_save: 삭제 완료")
+                        }
                     }
                 }
 
                 override fun onFailure(call: Call<PostModel>, t: Throwable) {
-                    Log.d("$TAG", "item_save: 리스폰 실패 : $t")
+                    Log.d(classTag, "item_save: 리스폰 실패 : $t")
 
                 }
             })
@@ -456,13 +458,13 @@ class MindMapFragment : Fragment() {
                         response: Response<List<FileModel>>
                     ) {
                         Log.d(
-                            "$TAG",
+                            classTag,
                             "item_file_load: 리스폰 완료 ${response.body()!!.size}"
                         )
                         val list = mutableListOf<FileModel>()
-                        for (i in 0 until response.body()!!.size) {
+                        for (i in response.body()!!.indices) {
                             Log.d(
-                                "$TAG",
+                                classTag,
                                 "item_file_load/fileName: ${response.body()!![i].getFileName()}, ${response.body()!![i].getFileRealName()}"
                             )
                             val ar: List<String> = response.body()!![i].getFileName().split('.')
@@ -480,14 +482,14 @@ class MindMapFragment : Fragment() {
                         fileList.addAll(list)
 
                         Log.d(
-                            "$TAG",
+                            classTag,
                             "item_file_load/filesize: ${fileList.size}"
                         )
                         fileAdapter.notifyDataSetChanged()
                     }
 
                     override fun onFailure(call: Call<List<FileModel>>, t: Throwable) {
-                        Log.d("$TAG", "item_file_load: 리스폰 실패")
+                        Log.d(classTag, "item_file_load: 리스폰 실패")
                     }
                 })
         }
@@ -505,10 +507,10 @@ class MindMapFragment : Fragment() {
         }
 
         val mLayoutManager: RecyclerView.LayoutManager =
-            LinearLayoutManager(context!!)
-        fileListView.setLayoutManager(mLayoutManager)
+            LinearLayoutManager(requireContext())
+        fileListView.layoutManager = mLayoutManager
 
-        val dividerItemDecoration = DividerItemDecoration(context!!, VERTICAL)
+        val dividerItemDecoration = DividerItemDecoration(requireContext(), VERTICAL)
         fileListView.addItemDecoration(dividerItemDecoration)
 
         fileListView.adapter = fileAdapter
@@ -588,13 +590,13 @@ class MindMapFragment : Fragment() {
                             call: Call<PostModel>,
                             response: Response<PostModel>
                         ) {
-                            Log.d("$TAG", "item_file_del: 리스폰 성공 ${response.body()!!.error}")
+                            Log.d(classTag, "item_file_del: 리스폰 성공 ${response.body()!!.error}")
                             filePopupWindow.dismiss()
                             saveFileDB(targetItem, editor, adapter.mapEditable)
                         }
 
                         override fun onFailure(call: Call<PostModel>, t: Throwable) {
-                            Log.d("$TAG", "item_file_del: 리스폰 실패 ${t}")
+                            Log.d(classTag, "item_file_del: 리스폰 실패 ${t}")
                         }
                     })
                 warnPopupWindow.dismiss()
@@ -605,8 +607,8 @@ class MindMapFragment : Fragment() {
             }
         }
 
-        fileAdapter.setOnFileListener { view, fileModel ->
-            Log.d("$TAG", "fileClickListener: ${fileModel.getFileRealName()}")
+        fileAdapter.setOnFileListener { _, fileModel ->
+            Log.d(classTag, "fileClickListener: ${fileModel.getFileRealName()}")
 
             val uri =
                 "/upload/$mapID/${targetItem.value.getItemID()}/${fileModel.getFileRealName()}"
@@ -615,11 +617,11 @@ class MindMapFragment : Fragment() {
                     call: Call<ResponseBody>,
                     response: Response<ResponseBody>
                 ) {
-                    Log.d("$TAG", "item_file_down: 리스폰 성공")
+                    Log.d(classTag, "item_file_down: 리스폰 성공")
 
-                    val mimeType = "${fileModel.getFileRealName()}".substring(
-                        "${fileModel.getFileRealName()}".indexOf(".") + 1,
-                        "${fileModel.getFileRealName()}".length
+                    val mimeType = fileModel.getFileRealName().substring(
+                        fileModel.getFileRealName().indexOf(".") + 1,
+                        fileModel.getFileRealName().length
                     )
 
                     try {
@@ -631,13 +633,13 @@ class MindMapFragment : Fragment() {
                             inputStream = response.body()!!.byteStream()
                             outputStream =
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                    val resolver = context!!.contentResolver
+                                    val resolver = requireContext().contentResolver
                                     val uri = resolver.insert(
                                         MediaStore.Files.getContentUri("external"),
                                         ContentValues().apply {
                                             put(
                                                 MediaStore.MediaColumns.DISPLAY_NAME,
-                                                "${fileModel.getFileRealName()}"
+                                                fileModel.getFileRealName()
                                             )
                                             put(
                                                 MediaStore.MediaColumns.MIME_TYPE,
@@ -657,7 +659,7 @@ class MindMapFragment : Fragment() {
                                         folder.mkdirs()
                                     }
                                     val file =
-                                        File(folderPath + File.separator + "${fileModel.getFileRealName()}")
+                                        File(folderPath + File.separator + fileModel.getFileRealName())
                                     if (file.exists()) {
                                         file.delete()
                                     }
@@ -665,33 +667,33 @@ class MindMapFragment : Fragment() {
                                 }
                             if (outputStream != null) {
                                 while (true) {
-                                    val read: Int? = inputStream?.read(fileReader)
+                                    val read: Int = inputStream.read(fileReader)
                                     if (read == -1) {
                                         break
                                     }
-                                    outputStream?.write(fileReader, 0, read!!)
-                                    fileSizeDownloaded += read?.toLong()!!
+                                    outputStream.write(fileReader, 0, read)
+                                    fileSizeDownloaded += read.toLong()
                                 }
-                                outputStream?.flush()
+                                outputStream.flush()
                             }
                         } catch (e: IOException) {
-                            Log.d("$TAG", "IOException: ${e.printStackTrace()}")
+                            Log.d(classTag, "IOException: ${e.printStackTrace()}")
                         } finally {
                             inputStream?.close()
                             outputStream?.close()
                         }
                     } catch (e: IOException) {
-                        Log.d("$TAG", "IOException: ${e.printStackTrace()}")
+                        Log.d(classTag, "IOException: ${e.printStackTrace()}")
                     }
                 }
 
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                    Log.d("$TAG", "item_file_down: 리스폰 실패 $t")
+                    Log.d(classTag, "item_file_down: 리스폰 실패 $t")
                 }
 
             })
             Toast.makeText(
-                context!!,
+                requireContext(),
                 "다운로드가 시작되었습니다.",
                 Toast.LENGTH_SHORT
             ).show()
@@ -707,88 +709,89 @@ class MindMapFragment : Fragment() {
          * file intent 설정 초기화
          */
         resultLauncher = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult(),
-            ActivityResultCallback { result ->
-                if (result.resultCode == RESULT_OK) {
-                    val intent = result.data
-                    val uri = intent!!.data
-                    Log.d("$TAG", "resultLauncher?: ${uri}")
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val intent = result.data
+                val uri = intent!!.data
+                Log.d(classTag, "resultLauncher?: $uri")
 
-                    lateinit var multiPartFile: MultipartBody.Part
-                    lateinit var fileName: String
+                lateinit var multiPartFile: MultipartBody.Part
+                lateinit var fileName: String
 
-                    context!!.contentResolver.query(uri!!, null, null, null, null)?.let {
-                        if (it.moveToNext()) {
-                            fileName = it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                requireContext().contentResolver.query(uri!!, null, null, null, null)?.let {
+                    if (it.moveToNext()) {
+                        fileName =
+                            it.getString(it.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME))
 
-                            val requestBody = object : RequestBody() {
-                                override fun contentType(): MediaType? {
-                                    return context!!.contentResolver.getType(uri)
-                                        ?.toMediaType()
-                                }
-
-                                override fun writeTo(sink: BufferedSink) {
-                                    sink.writeAll(
-                                        context!!.contentResolver.openInputStream(uri)
-                                            ?.source()!!
-                                    )
-                                }
+                        val requestBody = object : RequestBody() {
+                            override fun contentType(): MediaType? {
+                                return requireContext().contentResolver.getType(uri)
+                                    ?.toMediaType()
                             }
-                            it.close()
-                            multiPartFile =
-                                MultipartBody.Part.createFormData("media", fileName, requestBody)
-                        } else {
-                            it.close()
-                            null
+
+                            override fun writeTo(sink: BufferedSink) {
+                                sink.writeAll(
+                                    requireContext().contentResolver.openInputStream(uri)
+                                        ?.source()!!
+                                )
+                            }
                         }
-                    }
-
-                    Log.d(
-                        "$TAG",
-                        "resultlauncher/fileInfo: $multiPartFile!!.body.contentType() $fileName"
-                    )
-
-                    val ar: List<String> = fileName.split('.')
-                    val ext = ar[ar.size - 1]
-
-                    val progressBar = filePopupView.findViewById<LinearLayout>(R.id.progressBar)
-                    progressBar.visibility = View.VISIBLE
-
-                    // zip jpg png hwp pptx ppt
-                    if (ext.compareTo("zip", true) == 0 || ext.compareTo("jpg", true) == 0 ||
-                        ext.compareTo("png", true) == 0 || ext.compareTo("hwp", true) == 0 ||
-                        ext.compareTo("ppt", true) == 0 || ext.compareTo("pptx", true) == 0
-                    ) {
-                        api.item_file_save(multiPartFile, userID, targetItem.value.getItemID())
-                            .enqueue(object : Callback<String> {
-                                override fun onResponse(
-                                    call: Call<String>,
-                                    response: Response<String>
-                                ) {
-                                    Log.d(
-                                        "$TAG",
-                                        "item_file_save: 리스폰 완료 ${response.body()}"
-                                    )
-                                    progressBar.visibility = View.GONE
-                                    filePopupWindow.dismiss()
-                                    saveFileDB(targetItem, editor, adapter.mapEditable)
-                                }
-
-                                override fun onFailure(call: Call<String>, t: Throwable) {
-                                    Log.d("$TAG", "item_file_save: 리스폰 실패 $t")
-                                    filePopupWindow.dismiss()
-                                    progressBar.visibility = View.GONE
-                                }
-                            })
+                        it.close()
+                        multiPartFile =
+                            MultipartBody.Part.createFormData("media", fileName, requestBody)
                     } else {
-                        Toast.makeText(
-                            context!!,
-                            "지원하지 않는 파일 형식입니다.\n지원하는 확장명 : .zip .jpg .png .hwp .pptx .ppt",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        it.close()
+                        null
                     }
                 }
-            })
+
+                Log.d(
+                    classTag,
+                    "resultlauncher/fileInfo: $multiPartFile!!.body.contentType() $fileName"
+                )
+
+                val ar: List<String> = fileName.split('.')
+                val ext = ar[ar.size - 1]
+
+                val progressBar = filePopupView.findViewById<LinearLayout>(R.id.progressBar)
+                progressBar.visibility = View.VISIBLE
+
+                // zip jpg png hwp pptx ppt
+                if (ext.compareTo("zip", true) == 0 || ext.compareTo("jpg", true) == 0 ||
+                    ext.compareTo("png", true) == 0 || ext.compareTo("hwp", true) == 0 ||
+                    ext.compareTo("ppt", true) == 0 || ext.compareTo("pptx", true) == 0
+                ) {
+                    api.item_file_save(multiPartFile, userID, targetItem.value.getItemID())
+                        .enqueue(object : Callback<String> {
+                            override fun onResponse(
+                                call: Call<String>,
+                                response: Response<String>
+                            ) {
+                                Log.d(
+                                    classTag,
+                                    "item_file_save: 리스폰 완료 ${response.body()}"
+                                )
+                                progressBar.visibility = View.GONE
+                                filePopupWindow.dismiss()
+                                saveFileDB(targetItem, editor, adapter.mapEditable)
+                            }
+
+                            override fun onFailure(call: Call<String>, t: Throwable) {
+                                Log.d(classTag, "item_file_save: 리스폰 실패 $t")
+                                filePopupWindow.dismiss()
+                                progressBar.visibility = View.GONE
+                            }
+                        })
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "지원하지 않는 파일 형식입니다.\n지원하는 확장명 : .zip .jpg .png .hwp .pptx .ppt",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
 
         /**
          * 노드 클릭 시 이벤트 실행
@@ -797,11 +800,12 @@ class MindMapFragment : Fragment() {
          * 하단 메뉴 3 : 노드 삭제, 하위 노드도 함께 삭제된다.
          * 하단 메뉴 4 : 노드 파일 설정
          */
-        adapter.setOnItemListener { view, node ->
-            Log.d("$TAG", "setOnItemListener: ${node.value.getItemID()}")
+        adapter.setOnItemListener { _, node ->
+            Log.d(classTag, "setOnItemListener: ${node.value.getItemID()}")
             val id = node.value.getItemID()
             if (id != "root") {
                 targetItem = node
+                parentItemID = node.getParentNode().value.getItemID()
                 targetItemID = node.value.getItemID()
                 val visible =
                     id != "grade1" && id != "grade2" && id != "grade3" && id != "grade4"
@@ -812,12 +816,12 @@ class MindMapFragment : Fragment() {
 
                 binding.bottomNavigationView.run {
                     setOnItemSelectedListener { item ->
-                        when (item.itemId) {
+                        val b = when (item.itemId) {
                             R.id.bottomMenu1 -> {
                                 val last = if (node.value.getPosition()) "L" else "R"
                                 val parent =
                                     if (visible) node.value.getItemID()
-                                        .split("_")[1].split("$last")[0]
+                                        .split("_")[1].split(last)[0]
                                     else node.value.getItemID().split("_")[0]
                                 val item: NodeModel<ItemModel> =
                                     NodeModel<ItemModel>(
@@ -829,7 +833,7 @@ class MindMapFragment : Fragment() {
                                         )
                                     )
                                 Log.d(
-                                    "$TAG",
+                                    classTag,
                                     "setOnItemListener/bottomMenu1:  ${item.value.getItemID()}"
                                 )
                                 editor.addChildNodes(node, item)
@@ -869,7 +873,7 @@ class MindMapFragment : Fragment() {
 
                                     for (i in children) {
                                         Log.d(
-                                            "$TAG",
+                                            classTag,
                                             "setOnItemListener/bottomMenu3: ${i.value.getItemID()}"
                                         )
                                         saveDB(i, null, "delete")
@@ -889,8 +893,8 @@ class MindMapFragment : Fragment() {
                             }
                             R.id.bottomMenu4 -> {
                                 Log.d(
-                                    "$TAG",
-                                    "setOnItemListener/bottomMenu4: ${node} $targetItem"
+                                    classTag,
+                                    "setOnItemListener/bottomMenu4: $node $targetItem"
                                 )
                                 saveFileDB(node, editor, adapter.mapEditable)
                                 binding.bottomNavigationView.visibility = View.GONE
@@ -900,6 +904,7 @@ class MindMapFragment : Fragment() {
                                 true
                             }
                         }
+                        b
                     }
                 }
             }
@@ -909,7 +914,7 @@ class MindMapFragment : Fragment() {
          * 노드 롱클릭 시 이벤트 실행
          * 루트/학년 하위 노드인 경우 노드 Drag & Drop 실행
          */
-        adapter.setOnItemLongListener { item, node ->
+        adapter.setOnItemLongListener { _, node ->
             if (node.value.getItemID() != "root" &&
                 node.value.getItemID() != "grade1" &&
                 node.value.getItemID() != "grade2" &&
@@ -923,7 +928,7 @@ class MindMapFragment : Fragment() {
          * 노드 더블클릭 시 이벤트 실행
          * 노드 제목/내용 설정
          */
-        adapter.setOnItemDoubleListener { item, node, b ->
+        adapter.setOnItemDoubleListener { _, node, b ->
             targetItem = node
             val id = node.value.getItemID()
             if (id != "root" && id != "grade1" && id != "grade2" && id != "grade3" && id != "grade4") {
@@ -975,7 +980,7 @@ class MindMapFragment : Fragment() {
             ) {
                 if (draggingNode != null && hittingNode != null) {
                     Log.d(
-                        "$TAG",
+                        classTag,
                         "onDragMoveNodesHit: draging[${(draggingNode.value as ItemModel).getItemID()}]" +
                                 "hittingNode[${(hittingNode.value as ItemModel).getItemID()}]"
                     )
@@ -993,20 +998,21 @@ class MindMapFragment : Fragment() {
             ) {
                 if (draggingNode != null && hittingNode != null) {
                     Log.d(
-                        "$TAG",
+                        classTag,
                         "onDragMoveNodesEnd: draging[${(draggingNode.value as ItemModel).getItemID()}]" +
                                 "hittingNode[${(hittingNode.value as ItemModel).getItemID()}]"
                     )
                     val dNode = draggingNode as NodeModel<ItemModel>
                     val hNode = hittingNode as NodeModel<ItemModel>
 
+                    parentItemID = hNode.value.getItemID()
                     val hLast = if ((hittingNode.value as ItemModel).getPosition()) "L" else "R"
                     targetItemID = dNode.value.getItemID()
                     val parent =
                         if (hNode.value.getItemID() != "root" && hNode.value.getItemID() != "grade1" && hNode.value.getItemID() != "grade2" &&
                             hNode.value.getItemID() != "grade3" && hNode.value.getItemID() != "grade4"
                         )
-                            hNode.value.getItemID().split("_")[1].split("$hLast")[0]
+                            hNode.value.getItemID().split("_")[1].split(hLast)[0]
                         else hNode.value.getItemID().split("_")[0]
                     dNode.value.setItemID(
                         "${parent}_${
@@ -1016,11 +1022,11 @@ class MindMapFragment : Fragment() {
                             )
                         }$hLast"
                     )
-                    Log.d("$TAG", "dNodeItemID: ${dNode.value.getItemID()}")
+                    Log.d(classTag, "dNodeItemID: ${dNode.value.getItemID()}")
                     if (draggingView != null) {
                         Log.d(
-                            "$TAG",
-                            "dNodeItemID/targetItem.value.getItemID(): ${targetItemID}"
+                            classTag,
+                            "dNodeItemID/targetItem.value.getItemID(): $targetItemID"
                         )
                         saveDB(draggingNode, draggingView, "update")
                     }
@@ -1041,7 +1047,7 @@ class MindMapFragment : Fragment() {
         binding.popularLayout.setOnClickListener {
             val visible: Boolean = binding.mapHit.visibility == View.VISIBLE &&
                     binding.mapRecommend.visibility == View.VISIBLE
-            Log.d("$TAG", "popularLayout: $visible")
+            Log.d(classTag, "popularLayout: $visible")
             if (!visible) {
                 binding.mapHit.visibility = View.VISIBLE
                 binding.mapRecommend.visibility = View.VISIBLE
@@ -1060,22 +1066,22 @@ class MindMapFragment : Fragment() {
             api.map_like(userID, mapID).enqueue(object : Callback<PostModel> {
                 override fun onResponse(call: Call<PostModel>, response: Response<PostModel>) {
                     Log.d(
-                        "$TAG",
+                        classTag,
                         "map_like: 리스폰 성공 ${response.body()?.error.toString()}"
                     )
                     if (response.body()?.error.toString() == "ok") {
-                        mapRecommend = mapRecommend + 1
+                        mapRecommend += 1
                         binding.mapRecommend.text = mapRecommend.toString()
                     }
                     if (response.body()?.error.toString() == "failed") {
                         Toast.makeText(
-                            context!!, "이미 추천했습니다.", Toast.LENGTH_SHORT
+                            requireContext(), "이미 추천했습니다.", Toast.LENGTH_SHORT
                         ).show()
                     }
                 }
 
                 override fun onFailure(call: Call<PostModel>, t: Throwable) {
-                    Log.d("$TAG", "map_like: 리스폰 실패 : $t")
+                    Log.d(classTag, "map_like: 리스폰 실패 : $t")
                 }
             })
         }
@@ -1116,11 +1122,11 @@ class MindMapFragment : Fragment() {
                     call: Call<PostModel>,
                     response: Response<PostModel>
                 ) {
-                    Log.d("$TAG", "map_update: 리스폰 성공 ${response.body()!!.error}")
+                    Log.d(classTag, "map_update: 리스폰 성공 ${response.body()!!.error}")
                 }
 
                 override fun onFailure(call: Call<PostModel>, t: Throwable) {
-                    Log.d("$TAG", "map_update: 리스폰 실패 : $t")
+                    Log.d(classTag, "map_update: 리스폰 실패 : $t")
                 }
             })
         }
@@ -1139,7 +1145,7 @@ class MindMapFragment : Fragment() {
                         }
                         else -> {
                             Toast.makeText(
-                                context!!, "패스워드가 비어있습니다.", Toast.LENGTH_SHORT
+                                requireContext(), "패스워드가 비어있습니다.", Toast.LENGTH_SHORT
                             ).show()
                         }
                     }
@@ -1154,12 +1160,12 @@ class MindMapFragment : Fragment() {
                 when {
                     password != mapPassword || password == "" -> {
                         Toast.makeText(
-                            context!!, "비밀번호가 틀렸습니다.", Toast.LENGTH_SHORT
+                            requireContext(), "비밀번호가 틀렸습니다.", Toast.LENGTH_SHORT
                         ).show()
                     }
                     else -> {
                         Toast.makeText(
-                            context!!, "패스워드 입력을 완료했습니다.", Toast.LENGTH_SHORT
+                            requireContext(), "패스워드 입력을 완료했습니다.", Toast.LENGTH_SHORT
                         ).show()
                         binding.mapView.visibility = View.VISIBLE
                         publicPopupWindow.dismiss()
@@ -1173,7 +1179,12 @@ class MindMapFragment : Fragment() {
         val space_50dp = 30
         val space_20dp = 80
         val line = getLine()
-        return CompactHorizonLeftAndRightLayoutManager(context!!, space_50dp, space_20dp, line)
+        return CompactHorizonLeftAndRightLayoutManager(
+            requireContext(),
+            space_50dp,
+            space_20dp,
+            line
+        )
     }
 
     private fun getLine(): BaseLine {

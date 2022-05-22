@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
@@ -58,49 +59,60 @@ class WriteNoticeActivity : AppCompatActivity() {
             val editTitle = binding.editTitle.text.toString()
             val editcontent = binding.editNotice.text.toString()
             if (binding.editTitle.text.isBlank() || binding.editNotice.text.isBlank()) editType = 2
-            if (editType == 1) {
-                api.notice_update(
-                    type,
-                    key,
-                    editTitle,
-                    editcontent
-                ).enqueue(object : Callback<PostModel> {
-                    override fun onResponse(call: Call<PostModel>, response: Response<PostModel>) {
-                    }
+            when (editType) {
+                1 -> {
+                    api.notice_update(
+                        type,
+                        key,
+                        editTitle,
+                        editcontent
+                    ).enqueue(object : Callback<PostModel> {
+                        override fun onResponse(call: Call<PostModel>, response: Response<PostModel>) {
+                            Log.d("수정성공","sql:${response.body()?.error}, 타입:$type, 키:$key, 타이틀:$editTitle, 내용:$editcontent")
+                        }
 
-                    override fun onFailure(call: Call<PostModel>, t: Throwable) {
-                    }
+                        override fun onFailure(call: Call<PostModel>, t: Throwable) {
+                            Log.d("수정실패","에러:${t.message}, 타입:$type, 키:$key, 타이틀:$editTitle, 내용:$editcontent")
+                        }
 
-                })
-                Handler(Looper.getMainLooper()).postDelayed({
-                    intent.apply {
-                        putExtra("title", editTitle)
-                        putExtra("content", editcontent)
-                    }
-                    setResult(Activity.RESULT_OK, intent)
-                    finish()
-                }, 1000)
-            } else if (editType == 0) {
-                api.notice_save(
-                    type,
-                    editTitle,
-                    userID,
-                    date,
-                    editcontent
-                ).enqueue(object : Callback<PostModel> {
-                    override fun onResponse(call: Call<PostModel>, response: Response<PostModel>) {
-                    }
+                    })
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        intent.apply {
+                            putExtra("title", editTitle)
+                            putExtra("content", editcontent)
+                        }
+                        setResult(Activity.RESULT_OK, intent)
+                        finish()
+                    }, 1000)
+                }
+                0 -> {
+                    api.notice_save(
+                        type,
+                        editTitle,
+                        userID,
+                        date,
+                        editcontent
+                    ).enqueue(object : Callback<PostModel> {
+                        override fun onResponse(call: Call<PostModel>, response: Response<PostModel>) {
 
-                    override fun onFailure(p0: Call<PostModel>, t: Throwable) {
-                    }
+                        }
 
-                })
-                Handler(Looper.getMainLooper()).postDelayed({
-                    setResult(Activity.RESULT_OK, intent)
-                    finish()
-                }, 1000)
-            } else {
-                Toast.makeText(this, "제목 또는 내용이 비어있습니다.", Toast.LENGTH_SHORT).show()
+                        override fun onFailure(p0: Call<PostModel>, t: Throwable) {
+                        }
+
+                    })
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        intent.apply {
+                            putExtra("title", editTitle)
+                            putExtra("content", editcontent)
+                        }
+                        setResult(Activity.RESULT_OK, intent)
+                        finish()
+                    }, 1000)
+                }
+                else -> {
+                    Toast.makeText(this, "제목 또는 내용이 비어있습니다.", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

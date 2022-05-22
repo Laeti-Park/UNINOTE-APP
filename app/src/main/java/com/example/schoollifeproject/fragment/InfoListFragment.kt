@@ -158,7 +158,7 @@ class InfoListFragment : Fragment() {
                             )
                             )
                     list.add(contacts)
-                    Log.d(TAG,"$list")
+                    Log.d(TAG, "$list")
                 }
                 contactsList.clear()
                 contactsList.addAll(list)

@@ -17,7 +17,9 @@ import com.example.schoollifeproject.R
 import com.example.schoollifeproject.WriteNoticeActivity
 import com.example.schoollifeproject.adapter.AnnoFragmentAdapter
 import com.example.schoollifeproject.databinding.FragmentAnnoListBinding
-import com.example.schoollifeproject.model.*
+import com.example.schoollifeproject.model.APIS
+import com.example.schoollifeproject.model.NoteListContacts
+import com.example.schoollifeproject.model.NoticeListModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
